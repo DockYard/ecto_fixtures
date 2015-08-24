@@ -1,7 +1,7 @@
 defmodule Fixtures do
   require IEx
   def parse(path) do
-    {:ok, content} = File.read(path)
+    content = File.read!(path)
     {:ok, ast} = Code.string_to_quoted(content)
     _parse_ast(ast)
   end
