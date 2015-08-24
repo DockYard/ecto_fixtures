@@ -2,7 +2,7 @@
 
 Fixtures for Elixir
 
-[![Build Status](https://secure.travis-ci.org/dockyard/elixir-fixtures.svg?branch=master)](http://travis-ci.org/dockyard/fixtures)
+[![Build Status](https://secure.travis-ci.org/dockyard/elixir-fixtures.svg?branch=master)](http://travis-ci.org/dockyard/elixir-fixtures)
 
 ## Usage ##
 
