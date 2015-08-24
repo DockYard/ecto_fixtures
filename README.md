@@ -38,7 +38,7 @@ on how to properly submit issues and pull requests.
 
 ## Legal ##
 
-[DockYard](http://dockyard.com/), LLC &copy; 2015
+[DockYard](http://dockyard.com/), Inc. &copy; 2015
 
 [@dockyard](http://twitter.com/dockyard)
 
