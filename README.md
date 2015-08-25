@@ -12,7 +12,7 @@ fixture file is as:
 ```elixir
 # test/fixtures/accounts.exs
 
-accounts do
+accounts model: Account, repo: MyRepo do
   test do
     email "test@example.com"
     name "Brian Cardarella"
