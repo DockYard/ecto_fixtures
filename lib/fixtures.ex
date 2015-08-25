@@ -9,7 +9,6 @@ defmodule Fixtures do
   defp _parse_ast({:__block__, _, tables}) when is_list(tables) do
     _parse_tables(tables)
   end
-
   defp _parse_ast(table) do
     _parse_tables([table])
   end
@@ -20,31 +19,46 @@ defmodule Fixtures do
     end
   end
 
-  defp _parse_table({name, _, [[do: {:__block__, _, rows}]]}) do
-    _parse_table_rows(name, rows)
+  defp _parse_table({name, _, table_data}) do
+    Map.put(%{}, name, _parse_table_arguments(table_data))
   end
 
-  defp _parse_table({name, _, [[do: row]]}) do
-    _parse_table_rows(name, [row])
+  defp _parse_table_arguments([[do: {:__block__, [], rows}]]=arguments) when length(arguments) == 1 do
+    _parse_table_rows(rows)
+  end
+  defp _parse_table_arguments([[do: row]]) when is_tuple(row) do
+    _parse_table_rows([row])
+  end
+  defp _parse_table_arguments([options|tail]=arguments) when length(arguments) > 1 do
+    _parse_table_options(options)
+    |> Map.merge(%{rows: _parse_table_arguments(tail) })
   end
 
-  defp _parse_table_rows(name, rows) do
-    Map.put(%{}, name, _parse_rows(rows))
+  defp _parse_table_options([]), do: %{}
+  defp _parse_table_options([{type, quote}|tail]) do
+    Map.put(%{}, type, Code.eval_quoted(quote) |> Tuple.to_list |> List.first)
+    |> Map.merge(_parse_table_options(tail))
   end
 
-  defp _parse_rows(rows) do
-    Enum.reduce(rows, %{}, &_add_row_to_map(&1, &2))
+  defp _parse_table_rows([]), do: %{}
+  defp _parse_table_rows([row|tail]) do
+    _parse_row(row)
+    |> Map.merge(_parse_table_rows(tail))
   end
 
-  defp _add_row_to_map({name, _, [[do: {_, _, columns}]]}, rows) do
-    Map.put(rows, name, _parse_columns(columns))
+  defp _parse_row({name, _, [[do: {:__block__, _, columns}]]}) do
+    _parse_row(name, columns)
+  end
+  defp _parse_row({name, _, [[do: column]]}) do
+    _parse_row(name, [column])
+  end
+  defp _parse_row(name, columns) do
+    Map.put(%{}, name, _parse_columns(columns))
   end
 
-  defp _parse_columns(columns) do
-    Enum.reduce(columns, %{}, &_add_column_to_map(&1, &2))
-  end
-
-  defp _add_column_to_map({key, _, [value]}, columns) do
-    Map.put(columns, key, value)
+  defp _parse_columns([]), do: %{}
+  defp _parse_columns([{field, _, [value]}|tail]) do
+    Map.put(%{}, field, value)
+    |> Map.merge(_parse_columns(tail))
   end
 end
