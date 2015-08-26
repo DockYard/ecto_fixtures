@@ -12,10 +12,69 @@ fixture file is as:
 ```elixir
 # test/fixtures/accounts.exs
 
-accounts model: Account, repo: MyRepo do
+accounts model: Account, repo: Repo do
   test do
     email "test@example.com"
     name "Brian Cardarella"
+  end
+end
+```
+
+## Associations
+
+Associations can be made between data sets, reference the data set's
+name and label:
+
+### Belongs To
+
+```elixir
+accounts model: Account, repo: Repo do
+  brian do
+    name "Brian"
+  end
+end
+
+events model: Event, repo: Repo do
+  one do
+    name "First Event"
+    account accounts.brian
+  end
+end
+```
+
+### Has One
+
+```elixir
+accounts model: Account, repo: Repo do
+  brian do
+    name "Brian"
+    pet pets.boomer
+  end
+end
+
+pets model: Pet, repo: Repo do
+  boomer do
+    name "Boomer"
+  end
+end
+```
+
+### Has Many
+
+```elixir
+accounts model: Account, repo: Repo do
+  brian do
+    name "Brian"
+    events [events.one, events.two]
+  end
+end
+
+events model: Event, repo: Repo do
+  one do
+    name "First Event"
+  end
+  two do
+    name "Second Event"
   end
 end
 ```
