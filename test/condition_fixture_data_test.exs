@@ -1,7 +1,5 @@
 defmodule ConditionFixtureDataTest do
   use ExUnit.Case
-  import Fixtures
-  require IEx
 
   test "generates primary key value if not present for each row" do
     data = %{

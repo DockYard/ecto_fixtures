@@ -1,6 +1,5 @@
 defmodule FixturesTest do
   use ExUnit.Case
-  import Fixtures
 
   test "parses single table and single row and single column into map" do
     map = File.read!("test/fixtures/single_table_single_row_single_column.exs")
