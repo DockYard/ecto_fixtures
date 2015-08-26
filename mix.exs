@@ -26,7 +26,7 @@ defmodule Fixtures.Mixfile do
   # Type `mix help deps` for more examples and options
   defp deps do
     [
-      {:ecto, "0.16.0"},
+      {:ecto, "1.0.0"},
       {:uuid, "~> 1.0"}
     ]
   end

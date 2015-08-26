@@ -5,5 +5,6 @@ defmodule Car do
 
   schema "cars" do
     field :color
+    belongs_to :owner, Owner
   end
 end
