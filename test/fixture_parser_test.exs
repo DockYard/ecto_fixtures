@@ -3,7 +3,8 @@ defmodule FixturesTest do
   import Fixtures
 
   test "parses single table and single row and single column into map" do
-    map = Fixtures.parse("test/fixtures/single_table_single_row_single_column.exs")
+    map = File.read!("test/fixtures/single_table_single_row_single_column.exs")
+    |> Fixtures.parse
     assert map == %{
       owners: %{
         model: Owner,
@@ -14,7 +15,8 @@ defmodule FixturesTest do
   end
 
   test "parses single table and single row and multiple columns into map" do
-    map = Fixtures.parse("test/fixtures/single_table_single_row_multiple_columns.exs")
+    map = File.read!("test/fixtures/single_table_single_row_multiple_columns.exs")
+    |> Fixtures.parse
     assert map == %{
       owners: %{
         model: Owner,
@@ -25,7 +27,8 @@ defmodule FixturesTest do
   end
 
   test "parses single table and multiple rows and single columns into map" do
-    map = Fixtures.parse("test/fixtures/single_table_multiple_rows_single_columns.exs")
+    map = File.read!("test/fixtures/single_table_multiple_rows_single_columns.exs")
+    |> Fixtures.parse
     assert map == %{
       owners: %{
         model: Owner,
@@ -39,7 +42,8 @@ defmodule FixturesTest do
   end
 
   test "parses single table and multiple rows and multiple columns into map" do
-    map = Fixtures.parse("test/fixtures/single_table_multiple_rows_multiple_columns.exs")
+    map = File.read!("test/fixtures/single_table_multiple_rows_multiple_columns.exs")
+    |> Fixtures.parse
     assert map == %{
       owners: %{
         model: Owner,
@@ -53,7 +57,8 @@ defmodule FixturesTest do
   end
 
   test "parses multiple tables and single rows and single columns into map" do
-    map = Fixtures.parse("test/fixtures/multiple_tables_single_rows_single_columns.exs")
+    map = File.read!("test/fixtures/multiple_tables_single_rows_single_columns.exs")
+    |> Fixtures.parse
     assert map == %{
       owners: %{
         model: Owner,
@@ -69,7 +74,8 @@ defmodule FixturesTest do
   end
 
   test "parses multiple tables and single rows and multiple columns into map" do
-    map = Fixtures.parse("test/fixtures/multiple_tables_single_rows_multiple_columns.exs")
+    map = File.read!("test/fixtures/multiple_tables_single_rows_multiple_columns.exs")
+    |> Fixtures.parse
     assert map == %{
       owners: %{
         model: Owner,
@@ -85,7 +91,8 @@ defmodule FixturesTest do
   end
 
   test "parses multiple tables and multiple rows and single columns into map" do
-    map = Fixtures.parse("test/fixtures/multiple_tables_multiple_rows_single_columns.exs")
+    map = File.read!("test/fixtures/multiple_tables_multiple_rows_single_columns.exs")
+    |> Fixtures.parse
     assert map == %{
       owners: %{
         model: Owner,
@@ -107,7 +114,8 @@ defmodule FixturesTest do
   end
 
   test "parses multiple tables and multiple rows and multiple columns into map" do
-    map = Fixtures.parse("test/fixtures/multiple_tables_multiple_rows_multiple_columns.exs")
+    map = File.read!("test/fixtures/multiple_tables_multiple_rows_multiple_columns.exs")
+    |> Fixtures.parse
     assert map == %{
       owners: %{
         model: Owner,

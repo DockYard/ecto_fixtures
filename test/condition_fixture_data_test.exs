@@ -82,7 +82,7 @@ defmodule ConditionFixtureDataTest do
   end
 
   test "sets foreign key for has_one association properly and removes association" do
-    data = Fixtures.parse("test/fixtures/associations_has_one.exs")
+    data = Fixtures.read("test/fixtures/associations_has_one.exs")
 
     assert is_nil(data.pets.rows.boomer[:owner_id])
 
@@ -93,7 +93,7 @@ defmodule ConditionFixtureDataTest do
   end
 
   test "sets foreign key for belongs_to association properly and removes association" do
-    data = Fixtures.parse("test/fixtures/associations_belongs_to.exs")
+    data = Fixtures.read("test/fixtures/associations_belongs_to.exs")
 
     assert is_nil(data.pets.rows.boomer[:owner_id])
 
@@ -104,7 +104,7 @@ defmodule ConditionFixtureDataTest do
   end
 
   test "sets foreign key for has_many association properly and removes association" do
-    data = Fixtures.parse("test/fixtures/associations_has_many.exs")
+    data = Fixtures.read("test/fixtures/associations_has_many.exs")
 
     assert is_nil(data.cars.rows.nissan[:owner_id])
     assert is_nil(data.cars.rows.tesla[:owner_id])

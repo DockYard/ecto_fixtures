@@ -1,6 +1,5 @@
 defmodule Fixtures.Parser do
-  def parse(path) do
-    content = File.read!(path)
+  def parse(content) do
     {:ok, ast} = Code.string_to_quoted(content)
     _parse_ast(ast)
   end
