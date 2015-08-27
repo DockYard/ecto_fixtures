@@ -1,8 +1,8 @@
-# Fixtures #
+# Ecto Fixtures #
 
-Fixtures for Elixir
+Fixtures for Ecto
 
-[![Build Status](https://secure.travis-ci.org/dockyard/elixir-fixtures.svg?branch=master)](http://travis-ci.org/dockyard/elixir-fixtures)
+[![Build Status](https://secure.travis-ci.org/dockyard/ecto-fixtures.svg?branch=master)](http://travis-ci.org/dockyard/ecto-fixtures)
 
 ## Usage ##
 
@@ -116,7 +116,7 @@ end
 
 * [Brian Cardarella](http://twitter.com/bcardarella)
 
-[We are very thankful for the many contributors](https://github.com/dockyard/elixir-fixtures/graphs/contributors)
+[We are very thankful for the many contributors](https://github.com/dockyard/ecto-fixtures/graphs/contributors)
 
 ## Versioning ##
 
@@ -125,7 +125,7 @@ This library follows [Semantic Versioning](http://semver.org)
 ## Want to help? ##
 
 Please do! We are always looking to improve this library. Please see our
-[Contribution Guidelines](https://github.com/dockyard/elixir-fixtures/blob/master/CONTRIBUTING.md)
+[Contribution Guidelines](https://github.com/dockyard/ecto-fixtures/blob/master/CONTRIBUTING.md)
 on how to properly submit issues and pull requests.
 
 ## Legal ##

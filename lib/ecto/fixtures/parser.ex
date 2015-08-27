@@ -1,4 +1,4 @@
-defmodule Fixtures.Parser do
+defmodule Ecto.Fixtures.Parser do
   def parse(content) do
     {:ok, ast} = Code.string_to_quoted(content)
     _parse_ast(ast)
