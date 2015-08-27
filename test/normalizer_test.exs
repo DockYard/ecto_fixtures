@@ -1,6 +1,6 @@
-defmodule NormalizeTest do
+defmodule Ecto.Fixtures.NormalizerTest do
   use Ecto.Fixtures.Integration.Case
-  import Fixtures, only: [fixtures: 1]
+  import Ecto.Fixtures, only: [fixtures: 1]
 
   test "normalized data allows proper access" do
     %{cars: cars, owners: owners, pets: pets} = fixtures(:insert_1)

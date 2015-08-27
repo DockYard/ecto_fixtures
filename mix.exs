@@ -1,8 +1,8 @@
-defmodule Fixtures.Mixfile do
+defmodule Ecto.Fixtures.Mixfile do
   use Mix.Project
 
   def project do
-    [app: :fixtures,
+    [app: :ecto_fixtures,
      version: "0.0.1",
      elixir: "~> 1.0",
      deps: deps]
@@ -12,7 +12,7 @@ defmodule Fixtures.Mixfile do
   #
   # Type `mix help compile.app` for more information
   def application do
-    [applications: [:logger, :ecto, :uuid, :postgrex]]
+    [applications: [:logger, :uuid]]
   end
 
   # Dependencies can be Hex packages:
@@ -26,8 +26,8 @@ defmodule Fixtures.Mixfile do
   # Type `mix help deps` for more examples and options
   defp deps do
     [
-      {:ecto, "> 0.0.0"},
-      {:postgrex, "> 0.0.0"},
+      {:ecto, "> 0.0.0", only: :test},
+      {:postgrex, "> 0.0.0", only: :test},
       {:uuid, "~> 1.0"}
     ]
   end
