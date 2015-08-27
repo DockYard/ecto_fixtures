@@ -2,7 +2,7 @@
 
 Fixtures for Ecto
 
-[![Build Status](https://secure.travis-ci.org/dockyard/ecto-fixtures.svg?branch=master)](http://travis-ci.org/dockyard/ecto-fixtures)
+[![Build Status](https://secure.travis-ci.org/dockyard/ecto_fixtures.svg?branch=master)](http://travis-ci.org/dockyard/ecto_fixtures)
 
 ## Usage ##
 
@@ -29,7 +29,7 @@ defmodule MyTestCase do
   import Ecto.Fixtures, only: [fixtures: 1]
 
   test "data test" do
-    { accounts: accounts } = fixtures(:accounts)
+    %{accounts: accounts} = fixtures(:accounts)
 
     assert accounts.test.email == "test@example.com"
   end
@@ -46,7 +46,7 @@ defmodule MyTestCase do
   import Ecto.Fixtures, only: [fixtures: 1]
 
   test "database data is inserted and equal to data set" do
-    { accounts: accounts } = fixtures(:accounts)
+    %{accounts: accounts} = fixtures(:accounts)
 
     assert accounts.test == Repo.get(Account, accounts.test.id)
   end
@@ -116,7 +116,7 @@ end
 
 * [Brian Cardarella](http://twitter.com/bcardarella)
 
-[We are very thankful for the many contributors](https://github.com/dockyard/ecto-fixtures/graphs/contributors)
+[We are very thankful for the many contributors](https://github.com/dockyard/ecto_fixtures/graphs/contributors)
 
 ## Versioning ##
 
@@ -125,7 +125,7 @@ This library follows [Semantic Versioning](http://semver.org)
 ## Want to help? ##
 
 Please do! We are always looking to improve this library. Please see our
-[Contribution Guidelines](https://github.com/dockyard/ecto-fixtures/blob/master/CONTRIBUTING.md)
+[Contribution Guidelines](https://github.com/dockyard/ecto_fixtures/blob/master/CONTRIBUTING.md)
 on how to properly submit issues and pull requests.
 
 ## Legal ##
