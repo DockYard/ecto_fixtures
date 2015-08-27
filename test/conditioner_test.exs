@@ -117,4 +117,12 @@ defmodule EctoFixtures.ConditionerTest do
     assert is_integer(data.cars.rows.tesla[:owner_id])
     refute Map.has_key?(data.owners.rows.brian, :cars)
   end
+
+  test "can evaluate functions to generate values" do
+    data = EctoFixtures.read("test/fixtures/function_call.exs")
+    |> EctoFixtures.parse
+    |> EctoFixtures.condition
+
+    assert data.owners.rows.brian.password_hash == :crypto.sha("password")
+  end
 end

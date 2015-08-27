@@ -16,6 +16,7 @@ accounts model: Account, repo: Repo do
   test do
     email "test@example.com"
     name "Brian Cardarella"
+    password_hash :crypto.sha("password")
   end
 end
 ```

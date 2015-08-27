@@ -19,6 +19,7 @@ defmodule EctoFixtures.Conditioner do
     data
     |> _condition_primary_key(table_name, row_name)
     |> _condition_associations(table_name, row_name)
+    |> _condition_function_calls(table_name, row_name)
   end
 
   defp _condition_primary_key(data, table_name, row_name) do
@@ -105,5 +106,16 @@ defmodule EctoFixtures.Conditioner do
 
   defp _get_path({{:., _, [{table_name, _, _}, row_name]}, _, _}) do
     [table_name, :rows, row_name]
+  end
+
+  def _condition_function_calls(data, table_name, row_name) do
+    Enum.reduce Map.keys(data[table_name].rows[row_name]), data, fn(column, data) ->
+      case data[table_name].rows[row_name][column] do
+        {{:., _, _}, _, _} = expr ->
+          put_in data[table_name].rows[row_name][column], elem(Code.eval_quoted(expr), 0)
+        _ ->
+          data
+      end
+    end
   end
 end
