@@ -1,4 +1,4 @@
-defmodule Ecto.Fixtures.Normalizer do
+defmodule EctoFixtures.Normalizer do
   def normalize(data) do
     Enum.into data, %{}, fn({type, attributes}) ->
       attributes = attributes

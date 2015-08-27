@@ -1,4 +1,4 @@
-defmodule Ecto.Fixtures.Conditioner do
+defmodule EctoFixtures.Conditioner do
   @max_id trunc(:math.pow(2, 30) - 1)
 
   def condition(data) do

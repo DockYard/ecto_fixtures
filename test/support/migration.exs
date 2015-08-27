@@ -1,4 +1,4 @@
-defmodule Ecto.Fixtures.Migrations do
+defmodule EctoFixtures.Migrations do
   use Ecto.Migration
 
   def change do

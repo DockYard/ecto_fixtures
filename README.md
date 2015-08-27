@@ -1,8 +1,8 @@
-# Ecto Fixtures #
+# EctoFixtures #
 
 Fixtures for Ecto
 
-[![Build Status](https://secure.travis-ci.org/dockyard/ecto-fixtures.svg?branch=master)](http://travis-ci.org/dockyard/ecto-fixtures)
+[![Build Status](https://secure.travis-ci.org/dockyard/ecto_fixtures.svg?branch=master)](http://travis-ci.org/dockyard/ecto_fixtures)
 
 ## Usage ##
 
@@ -21,12 +21,12 @@ end
 ```
 
 In your test file you can access the fixture sets with the
-`Ecto.Fixtures.fixture/1` function:
+`EctoFixtures.fixture/1` function:
 
 ```elixir
 defmodule MyTestCase do
   use ExUnit.Case
-  import Ecto.Fixtures, only: [fixtures: 1]
+  import EctoFixtures, only: [fixtures: 1]
 
   test "data test" do
     { accounts: accounts } = fixtures(:accounts)
@@ -43,7 +43,7 @@ returned from `fixtures/1` is actually an `Ecto.Model`.
 ```elixir
 defmodule MyTestCase do
   use ExUnit.Case
-  import Ecto.Fixtures, only: [fixtures: 1]
+  import EctoFixtures, only: [fixtures: 1]
 
   test "database data is inserted and equal to data set" do
     { accounts: accounts } = fixtures(:accounts)
@@ -116,7 +116,7 @@ end
 
 * [Brian Cardarella](http://twitter.com/bcardarella)
 
-[We are very thankful for the many contributors](https://github.com/dockyard/ecto-fixtures/graphs/contributors)
+[We are very thankful for the many contributors](https://github.com/dockyard/ecto_fixtures/graphs/contributors)
 
 ## Versioning ##
 
@@ -125,7 +125,7 @@ This library follows [Semantic Versioning](http://semver.org)
 ## Want to help? ##
 
 Please do! We are always looking to improve this library. Please see our
-[Contribution Guidelines](https://github.com/dockyard/ecto-fixtures/blob/master/CONTRIBUTING.md)
+[Contribution Guidelines](https://github.com/dockyard/ecto_fixtures/blob/master/CONTRIBUTING.md)
 on how to properly submit issues and pull requests.
 
 ## Legal ##
