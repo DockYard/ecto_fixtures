@@ -42,7 +42,7 @@ defmodule EctoFixtures.Mixfile do
   # Type `mix help deps` for more examples and options
   defp deps do
     [
-      {:ecto, "> 0.0.0", only: :test},
+      {:ecto, "> 0.0.0"},
       {:postgrex, "> 0.0.0", only: :test},
       {:uuid, "~> 1.0"}
     ]
