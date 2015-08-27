@@ -5,7 +5,7 @@ Code.require_file "./support/models.exs", __DIR__
 Code.require_file "./support/repo.exs", __DIR__
 Code.require_file "./support/migration.exs", __DIR__
 
-defmodule Ecto.Fixtures.Integration.Case do
+defmodule EctoFixtures.Integration.Case do
   use ExUnit.CaseTemplate
 
   setup_all do
@@ -24,5 +24,5 @@ _ = Ecto.Storage.down(BaseRepo)
 :ok = Ecto.Storage.up(BaseRepo)
 
 {:ok, _pid} = BaseRepo.start_link
-:ok = Ecto.Migrator.up(BaseRepo, 0, Ecto.Fixtures.Migrations, log: false)
+:ok = Ecto.Migrator.up(BaseRepo, 0, EctoFixtures.Migrations, log: false)
 Process.flag(:trap_exit, true)

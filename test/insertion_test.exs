@@ -1,6 +1,6 @@
-defmodule Ecto.Fixtures.InsertionTest do
-  use Ecto.Fixtures.Integration.Case
-  import Ecto.Fixtures, only: [fixtures: 1]
+defmodule EctoFixtures.InsertionTest do
+  use EctoFixtures.Integration.Case
+  import EctoFixtures, only: [fixtures: 1]
 
   @tag timeout: 30000000
   test "properly inserts fixtures into the database" do

@@ -1,4 +1,4 @@
-# Ecto Fixtures #
+# EctoFixtures #
 
 Fixtures for Ecto
 
@@ -21,12 +21,12 @@ end
 ```
 
 In your test file you can access the fixture sets with the
-`Ecto.Fixtures.fixture/1` function:
+`EctoFixtures.fixture/1` function:
 
 ```elixir
 defmodule MyTestCase do
   use ExUnit.Case
-  import Ecto.Fixtures, only: [fixtures: 1]
+  import EctoFixtures, only: [fixtures: 1]
 
   test "data test" do
     %{accounts: accounts} = fixtures(:accounts)
@@ -43,7 +43,7 @@ returned from `fixtures/1` is actually an `Ecto.Model`.
 ```elixir
 defmodule MyTestCase do
   use ExUnit.Case
-  import Ecto.Fixtures, only: [fixtures: 1]
+  import EctoFixtures, only: [fixtures: 1]
 
   test "database data is inserted and equal to data set" do
     %{accounts: accounts} = fixtures(:accounts)
