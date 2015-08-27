@@ -20,6 +20,39 @@ accounts model: Account, repo: Repo do
 end
 ```
 
+In your test file you can access the fixture sets with the
+`Ecto.Fixtures.fixture/1` function:
+
+```elixir
+defmodule MyTestCase do
+  use ExUnit.Case
+  import Ecto.Fixtures, only: [fixtures: 1]
+
+  test "data test" do
+    { accounts: accounts } = fixtures(:accounts)
+
+    assert accounts.test.email == "test@example.com"
+  end
+end
+```
+
+This data is also inserted into the database, the resulting data set
+returned from `fixtures/1` is actually an `Ecto.Model`.
+
+
+```elixir
+defmodule MyTestCase do
+  use ExUnit.Case
+  import Ecto.Fixtures, only: [fixtures: 1]
+
+  test "database data is inserted and equal to data set" do
+    { accounts: accounts } = fixtures(:accounts)
+
+    assert accounts.test == Repo.get(Account, accounts.test.id)
+  end
+end
+```
+
 ## Associations
 
 Associations can be made between data sets, reference the data set's

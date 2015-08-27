@@ -1,5 +1,6 @@
 defmodule Fixtures.Conditioner do
-  require IEx
+  @max_id trunc(:math.pow(2, 30) - 1)
+
   def condition(data) do
     Map.keys(data)
     |> Enum.reduce data, fn(table_name, data) ->
@@ -45,6 +46,7 @@ defmodule Fixtures.Conditioner do
 
   defp _generate_id_key_value(name) do
     :zlib.crc32(:zlib.open, name)
+    |> rem(@max_id)
   end
 
   defp _generate_binary_id_key_value(name) do

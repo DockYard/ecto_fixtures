@@ -12,7 +12,7 @@ defmodule Fixtures.Mixfile do
   #
   # Type `mix help compile.app` for more information
   def application do
-    [applications: [:logger, :ecto, :uuid]]
+    [applications: [:logger, :ecto, :uuid, :postgrex]]
   end
 
   # Dependencies can be Hex packages:
@@ -26,7 +26,8 @@ defmodule Fixtures.Mixfile do
   # Type `mix help deps` for more examples and options
   defp deps do
     [
-      {:ecto, "1.0.0"},
+      {:ecto, "> 0.0.0"},
+      {:postgrex, "> 0.0.0"},
       {:uuid, "~> 1.0"}
     ]
   end
