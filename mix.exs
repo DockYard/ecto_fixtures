@@ -3,9 +3,12 @@ defmodule EctoFixtures.Mixfile do
 
   def project do
     [app: :ecto_fixtures,
-     version: "0.0.1",
+     version: "0.0.2",
      elixir: "~> 1.0",
-     deps: deps]
+     name: "Ecto Fixtures",
+     deps: deps,
+     package: package,
+     description: description]
   end
 
   # Configuration for the OTP application
@@ -13,6 +16,19 @@ defmodule EctoFixtures.Mixfile do
   # Type `mix help compile.app` for more information
   def application do
     [applications: [:logger, :uuid]]
+  end
+
+  def description do
+    """
+    Ecto Fixtures provides a simple DSL for quickly creating fixture
+    data for your test suite.
+    """
+  end
+
+  def package do
+    [contributors: ["Brian Cardarella"],
+     licenses: ["MIT"],
+     links: %{"GitHub" => "https://github.com/dockyard/ecto_fixtures"}]
   end
 
   # Dependencies can be Hex packages:
