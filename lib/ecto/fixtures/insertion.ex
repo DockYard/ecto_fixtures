@@ -1,7 +1,7 @@
 defmodule EctoFixtures.Insertion do
   def insert(data, can_insert) do
     Enum.into data, %{}, fn({type, attributes}) ->
-      _ = put_in attributes.rows, Enum.reduce(attributes.rows, %{}, fn(row, rows) ->
+      attributes = put_in attributes.rows, Enum.reduce(attributes.rows, %{}, fn(row, rows) ->
         _insert(row, rows, attributes, can_insert)
       end)
 
