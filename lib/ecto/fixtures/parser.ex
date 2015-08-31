@@ -44,14 +44,20 @@ defmodule EctoFixtures.Parser do
     |> Map.merge(_parse_table_rows(tail))
   end
 
-  defp _parse_row({name, _, [[do: {:__block__, _, columns}]]}) do
-    _parse_row(name, columns)
+  defp _parse_row({name, _, args}) do
+    Map.put(%{}, name, _parse_row_args(args))
   end
-  defp _parse_row({name, _, [[do: column]]}) do
-    _parse_row(name, [column])
+
+  defp _parse_row_args([]), do: %{}
+  defp _parse_row_args([[do: {:__block__, _, columns}]|tail]) do
+    Map.merge(%{data: _parse_columns(columns)}, _parse_row_args(tail))
   end
-  defp _parse_row(name, columns) do
-    Map.put(%{}, name, _parse_columns(columns))
+  defp _parse_row_args([[do: column]|tail]) do
+    _parse_row_args([[do: {:__block__, [], [column]}]|tail])
+  end
+  defp _parse_row_args([[{arg_key, arg_value}]|tail]) do
+    Map.put(%{}, arg_key, arg_value)
+    |> Map.merge(_parse_row_args(tail))
   end
 
   defp _parse_columns([]), do: %{}

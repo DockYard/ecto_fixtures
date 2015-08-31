@@ -2,7 +2,6 @@ defmodule EctoFixtures.InsertionTest do
   use EctoFixtures.Integration.Case
   import EctoFixtures, only: [fixtures: 1]
 
-  @tag timeout: 30000000
   test "properly inserts fixtures into the database" do
     fixtures(:insert_1)
 
@@ -22,5 +21,14 @@ defmodule EctoFixtures.InsertionTest do
 
     assert Enum.at(pets, 0).name == "Boomer"
     assert Enum.at(pets, 0).owner_id == Enum.at(owners, 0).id
+  end
+
+  @tag timeout: 300_000
+  test "does not insert rows tagged with `virtual: true`" do
+    fixtures(:insert_2)
+
+    owners = BaseRepo.all(Owner)
+
+    assert length(owners) == 0
   end
 end
