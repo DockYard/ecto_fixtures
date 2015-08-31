@@ -8,7 +8,7 @@ defmodule EctoFixtures.ParserTest do
       owners: %{
         model: Owner,
         repo: Base, 
-        rows: %{brian: %{name: "Brian"}}
+        rows: %{brian: %{data: %{name: "Brian"}}}
       }
     }
   end
@@ -20,7 +20,7 @@ defmodule EctoFixtures.ParserTest do
       owners: %{
         model: Owner,
         repo: Base, 
-        rows: %{brian: %{name: "Brian", age: 35}}
+        rows: %{brian: %{data: %{ name: "Brian", age: 35}}}
       }
     }
   end
@@ -33,8 +33,8 @@ defmodule EctoFixtures.ParserTest do
         model: Owner,
         repo: Base, 
         rows: %{
-          brian: %{name: "Brian"},
-          stephanie: %{name: "Stephanie"}
+          brian: %{data: %{name: "Brian"}},
+          stephanie: %{data: %{name: "Stephanie"}}
         }
       }
     }
@@ -48,8 +48,8 @@ defmodule EctoFixtures.ParserTest do
         model: Owner,
         repo: Base, 
         rows: %{
-          brian: %{name: "Brian", age: 35},
-          stephanie: %{name: "Stephanie", age: 34}
+          brian: %{data: %{name: "Brian", age: 35}},
+          stephanie: %{data: %{name: "Stephanie", age: 34}}
         }
       }
     }
@@ -62,12 +62,12 @@ defmodule EctoFixtures.ParserTest do
       owners: %{
         model: Owner,
         repo: Base, 
-        rows: %{brian: %{name: "Brian"}}
+        rows: %{brian: %{data: %{name: "Brian"}}}
       },
       pets: %{
         model: Pet,
         repo: Base, 
-        rows: %{boomer: %{name: "Boomer"}}
+        rows: %{boomer: %{data: %{name: "Boomer"}}}
       }
     }
   end
@@ -79,12 +79,12 @@ defmodule EctoFixtures.ParserTest do
       owners: %{
         model: Owner,
         repo: Base, 
-        rows: %{brian: %{name: "Brian", age: 35}}
+        rows: %{brian: %{data: %{name: "Brian", age: 35}}}
       },
       pets: %{
         model: Pet,
         repo: Base, 
-        rows: %{boomer: %{name: "Boomer", age: 2}}
+        rows: %{boomer: %{data: %{name: "Boomer", age: 2}}}
       }
     }
   end
@@ -97,16 +97,16 @@ defmodule EctoFixtures.ParserTest do
         model: Owner,
         repo: Base, 
         rows: %{
-          brian: %{name: "Brian"},
-          stephanie: %{name: "Stephanie"}
+        brian: %{data: %{name: "Brian"}},
+          stephanie: %{data: %{name: "Stephanie"}}
         }
       },
       pets: %{
         model: Pet,
         repo: Base, 
         rows: %{
-          boomer: %{name: "Boomer"},
-          wiley: %{name: "Wiley"}
+        boomer: %{data: %{name: "Boomer"}},
+          wiley: %{data: %{name: "Wiley"}}
         }
       }
     }
@@ -120,16 +120,16 @@ defmodule EctoFixtures.ParserTest do
         model: Owner,
         repo: Base, 
         rows: %{
-          brian: %{name: "Brian", age: 35},
-          stephanie: %{name: "Stephanie", age: 34}
+          brian: %{data: %{name: "Brian", age: 35}},
+          stephanie: %{data: %{name: "Stephanie", age: 34}}
         }
       },
       pets: %{
         model: Pet,
         repo: Base, 
         rows: %{
-          boomer: %{name: "Boomer", age: 2},
-          wiley: %{name: "Wiley", age: 12}
+        boomer: %{data: %{name: "Boomer", age: 2}},
+          wiley: %{data: %{name: "Wiley", age: 12}}
         }
       }
     }

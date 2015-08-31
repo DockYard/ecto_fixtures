@@ -113,6 +113,47 @@ events model: Event, repo: Repo do
 end
 ```
 
+## Inheriting Data
+
+If you'd like to have default values inherited into other rows you can
+do that with the `inherit` option on the row defintion:
+
+```elixir
+accounts model: Account, repo: Repo do
+  default do
+    is_admin false
+  end
+
+  brian inherits: default
+    name "Brian"
+  end
+end
+
+other_accounts: Account, repo: Repo do
+  stephanie inherits: accounts.default do
+    name "Stephanie"
+  end
+end
+```
+
+When inheriting from rows in the same group you can simply refer to the
+row name. When referring to rows in other groups you have to refer to
+the group name and table name.
+
+### Virtual Rows
+
+Sometimes you may not want the row you inherit from to be inserted into
+the database. In this case you must set the `virtual: true` flag for
+that row:
+
+```elixir
+accounts model: Account, repo: repo do
+  default virtual: true do
+    is_admin false
+  end
+end
+```
+
 ## Authors ##
 
 * [Brian Cardarella](http://twitter.com/bcardarella)
