@@ -54,6 +54,24 @@ defmodule MyTestCase do
 end
 ```
 
+## Avoiding Inserts
+
+If you'd like the model structs without actually inserting into the
+database pass `insert: false` to `fixtures/2`.
+
+```elixir
+defmodule MyTestCase do
+  use ExUnit.Case
+  import EctoFixtures, only: [fixtures: 2]
+
+  test "database data is inserted and equal to data set" do
+    fixtures(:accounts, insert: false)
+
+    assert length(Repo.all(Account)) == 0
+  end
+end
+```
+
 ## Associations
 
 Associations can be made between data sets, reference the data set's
