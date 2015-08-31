@@ -1,5 +1,4 @@
 defmodule EctoFixtures.Insertion do
-  require IEx
   def insert(data) do
     Enum.into data, %{}, fn({type, attributes} = data) ->
       put_in attributes.rows, Enum.reduce(attributes.rows, %{}, fn(row, rows) ->

@@ -23,7 +23,6 @@ defmodule EctoFixtures.InsertionTest do
     assert Enum.at(pets, 0).owner_id == Enum.at(owners, 0).id
   end
 
-  @tag timeout: 300_000
   test "does not insert rows tagged with `virtual: true`" do
     fixtures(:insert_2)
 

@@ -132,6 +132,7 @@ end
 other_accounts: Account, repo: Repo do
   stephanie inherits: accounts.default do
     name "Stephanie"
+    is_admin true
   end
 end
 ```
@@ -139,6 +140,8 @@ end
 When inheriting from rows in the same group you can simply refer to the
 row name. When referring to rows in other groups you have to refer to
 the group name and table name.
+
+Inherited values can be overriden by defining values on the same column.
 
 ### Virtual Rows
 

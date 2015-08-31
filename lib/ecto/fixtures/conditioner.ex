@@ -1,6 +1,5 @@
 defmodule EctoFixtures.Conditioner do
   @max_id trunc(:math.pow(2, 30) - 1)
-  require IEx
 
   def condition(data) do
     Map.keys(data)
