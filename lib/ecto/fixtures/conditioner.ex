@@ -111,12 +111,10 @@ defmodule EctoFixtures.Conditioner do
 
   def _condition_function_calls(data, table_name, row_name) do
     Enum.reduce Map.keys(data[table_name].rows[row_name].data), data, fn(column, data) ->
-      case data[table_name].rows[row_name].data[column] do
-        {{:., _, _}, _, _} = expr ->
-          put_in data[table_name].rows[row_name].data[column], elem(Code.eval_quoted(expr), 0)
-        _ ->
-          data
-      end
+      value = data[table_name].rows[row_name].data[column]
+      |> Code.eval_quoted
+      |> elem(0)
+      put_in data[table_name].rows[row_name].data[column], value
     end
   end
 
