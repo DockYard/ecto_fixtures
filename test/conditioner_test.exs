@@ -123,7 +123,7 @@ defmodule EctoFixtures.ConditionerTest do
     |> EctoFixtures.parse
     |> EctoFixtures.condition
 
-    assert data.owners.rows.brian.data.password_hash == :crypto.sha("password")
+    assert data.owners.rows.brian.data.password_hash == :crypto.hash(:sha, "password")
   end
 
   test "can inherit from other rows" do

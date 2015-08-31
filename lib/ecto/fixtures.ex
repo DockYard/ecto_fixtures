@@ -10,7 +10,7 @@ defmodule EctoFixtures do
   end
 
   def fixtures(name, [insert: can_insert]) do
-    data = read("test/fixtures/#{name}.exs")
+    read("test/fixtures/#{name}.exs")
     |> parse
     |> condition
     |> insert(can_insert)
