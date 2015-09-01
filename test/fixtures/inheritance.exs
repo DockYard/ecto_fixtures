@@ -2,6 +2,7 @@ owners model: Owner, repo: BaseRepo do
   brian do
     name "Brian"
     admin false
+    template %Owner{}
     viewed_profile true
   end
 

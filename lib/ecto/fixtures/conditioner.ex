@@ -109,7 +109,7 @@ defmodule EctoFixtures.Conditioner do
     [table_name, :rows, row_name, :data]
   end
 
-  def _condition_function_calls(data, table_name, row_name) do
+  defp _condition_function_calls(data, table_name, row_name) do
     Enum.reduce Map.keys(data[table_name].rows[row_name].data), data, fn(column, data) ->
       value = data[table_name].rows[row_name].data[column]
       |> Code.eval_quoted
@@ -118,7 +118,7 @@ defmodule EctoFixtures.Conditioner do
     end
   end
 
-  def _condition_inheritance(data, table_name, row_name) do
+  defp _condition_inheritance(data, table_name, row_name) do
     if Map.has_key?(data[table_name].rows[row_name], :inherits) do
       put_in data[table_name].rows[row_name].data,
         Map.merge(_inherits_data(data, table_name, data[table_name].rows[row_name].inherits), data[table_name].rows[row_name].data)
@@ -127,11 +127,17 @@ defmodule EctoFixtures.Conditioner do
     end
   end
 
-  def _inherits_data(data, table_name, {{:., _, [{other_table_name, _, _}, other_row_name]}, _, _}) do
+  defp _inherits_data(data, table_name, {{:., _, [{other_table_name, _, _}, other_row_name]}, _, _}) do
     data[other_table_name].rows[other_row_name].data
+    |> _escape_values
   end
 
-  def _inherits_data(data, table_name, {other_row_name, _, _}) do
+  defp _inherits_data(data, table_name, {other_row_name, _, _}) do
     data[table_name].rows[other_row_name].data
+    |> _escape_values
+  end
+
+  defp _escape_values(map) do
+    Enum.into map, %{}, fn({key, value}) -> {key, Macro.escape(value)} end
   end
 end
