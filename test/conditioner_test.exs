@@ -126,6 +126,17 @@ defmodule EctoFixtures.ConditionerTest do
     assert data.owners.rows.brian.data.password_hash == :crypto.hash(:sha, "password")
   end
 
+  test "can evaluate Elixir types to generate values" do
+    data = EctoFixtures.read("test/fixtures/types.exs")
+    |> EctoFixtures.parse
+    |> EctoFixtures.condition
+
+    assert data.owners.rows.brian.data.map == %{foo: :bar}
+    assert data.owners.rows.brian.data.list == [1, 2, 3]
+    assert data.owners.rows.brian.data.tuple == {1, 2, 3}
+  end
+
+  @tag timeout: 3_000_000
   test "can inherit from other rows" do
     data = EctoFixtures.read("test/fixtures/inheritance.exs")
     |> EctoFixtures.parse

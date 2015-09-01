@@ -1,7 +1,7 @@
 owners model: Owner, repo: BaseRepo do
   brian do
     name "Brian"
-    admin fasle
+    admin false
     viewed_profile true
   end
 
