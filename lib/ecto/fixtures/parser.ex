@@ -12,13 +12,14 @@ defmodule EctoFixtures.Parser do
   end
 
   defp _parse_tables(tables) do
-    Enum.reduce tables, %{}, fn(table, acc) ->
-      Map.merge(acc, _parse_table(table))
+    Enum.reduce tables, [], fn(table, acc) ->
+      _parse_table(table)
+      |> Keyword.merge(acc)
     end
   end
 
   defp _parse_table({name, _, table_data}) do
-    Map.put(%{}, name, _parse_table_arguments(table_data))
+    [{name, _parse_table_arguments(table_data)}]
   end
 
   defp _parse_table_arguments([[do: {:__block__, [], rows}]]=arguments) when length(arguments) == 1 do
@@ -28,29 +29,30 @@ defmodule EctoFixtures.Parser do
     _parse_table_rows([row])
   end
   defp _parse_table_arguments([options|tail]=arguments) when length(arguments) > 1 do
-    _parse_table_options(options)
-    |> Map.merge(%{rows: _parse_table_arguments(tail) })
+    %{rows: _parse_table_arguments(tail)}
+    |> Map.merge(_parse_table_options(options))
   end
 
   defp _parse_table_options([]), do: %{}
-  defp _parse_table_options([{type, quote}|tail]) do
-    Map.put(%{}, type, Code.eval_quoted(quote) |> Tuple.to_list |> List.first)
+  defp _parse_table_options([{type, quoted}|tail]) do
+    Map.put(%{}, type, elem(Code.eval_quoted(quoted), 0))
     |> Map.merge(_parse_table_options(tail))
   end
 
-  defp _parse_table_rows([]), do: %{}
+  defp _parse_table_rows([]), do: []
   defp _parse_table_rows([row|tail]) do
-    _parse_row(row)
-    |> Map.merge(_parse_table_rows(tail))
+    _parse_table_rows(tail)
+    |> Keyword.merge(_parse_row(row))
   end
 
   defp _parse_row({name, _, args}) do
-    Map.put(%{}, name, _parse_row_args(args))
+    [{name, _parse_row_args(args)}]
   end
 
   defp _parse_row_args([]), do: %{}
   defp _parse_row_args([[do: {:__block__, _, columns}]|tail]) do
-    Map.merge(%{data: _parse_columns(columns)}, _parse_row_args(tail))
+    _parse_row_args(tail)
+    |> Map.merge(%{data: _parse_columns(columns)})
   end
   defp _parse_row_args([[do: column]|tail]) do
     _parse_row_args([[do: {:__block__, [], [column]}]|tail])
