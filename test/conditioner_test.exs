@@ -136,7 +136,6 @@ defmodule EctoFixtures.ConditionerTest do
     assert data.owners.rows.brian.data.tuple == {1, 2, 3}
   end
 
-  @tag timeout: 3_000_000
   test "can inherit from other rows" do
     data = EctoFixtures.read("test/fixtures/inheritance.exs")
     |> EctoFixtures.parse
