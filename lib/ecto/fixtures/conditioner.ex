@@ -55,11 +55,8 @@ defmodule EctoFixtures.Conditioner do
     UUID.uuid5(:oid, name)
   end
 
-  defp _key_from_array(keys), do: Enum.join(keys, "-")
-
   defp _condition_associations(data, table_name, row_name) do
     model = data[table_name][:model]
-    columns = data[table_name][:rows][row_name][:data]
 
     model.__schema__(:associations)
     |> Enum.reduce data, fn(association_name, data) ->
@@ -127,7 +124,7 @@ defmodule EctoFixtures.Conditioner do
     end
   end
 
-  defp _inherits_data(data, table_name, {{:., _, [{other_table_name, _, _}, other_row_name]}, _, _}) do
+  defp _inherits_data(data, _table_name, {{:., _, [{other_table_name, _, _}, other_row_name]}, _, _}) do
     data[other_table_name][:rows][other_row_name][:data]
     |> _escape_values
   end
