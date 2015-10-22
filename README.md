@@ -142,7 +142,7 @@ accounts model: Account, repo: Repo do
     is_admin false
   end
 
-  brian inherits: default
+  brian inherits: default do
     name "Brian"
   end
 end
