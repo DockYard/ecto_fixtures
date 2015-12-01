@@ -4,16 +4,22 @@ defmodule EctoFixtures do
   def condition(data), do: EctoFixtures.Conditioner.condition(data)
   def insert(data, can_insert), do: EctoFixtures.Insertion.insert(data, can_insert)
   def normalize(data), do: EctoFixtures.Normalizer.normalize(data)
+  def override(data, override_data), do: EctoFixtures.Overrider.override(data, override_data)
 
   def fixtures(name) do
     fixtures(name, insert: true)
   end
 
-  def fixtures(name, [insert: can_insert]) do
+  def fixtures(name, %{}=override) do
+    fixtures(name, insert: true, override: override)
+  end
+
+  def fixtures(name, opts) do
     read("test/fixtures/#{name}.exs")
     |> parse
     |> condition
-    |> insert(can_insert)
+    |> override(opts[:override])
+    |> insert(opts[:insert])
     |> normalize
   end
 end
