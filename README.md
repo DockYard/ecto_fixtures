@@ -72,6 +72,35 @@ defmodule MyTestCase do
 end
 ```
 
+## Optional Overrides
+
+You can override the fixture data on a per-usage basis by passing a map
+as the 2nd argument. The maps keys must correspond with the structure of
+the fixture names and row names column data you wish to override.
+
+**Note: you cannot add rows with the override. It is intended only to
+mutate the fixture column data**
+
+```elixir
+defmodule MyTestCase do
+  use ExUnit.Case
+  import EctoFixtures, only: [fixtures: 2]
+
+  test "data test" do
+    %{accounts: accounts} = fixtures(:accounts, %{
+      accounts: %{
+        test: %{
+          email: "other@example.com"
+        }
+      }
+    })
+
+    assert accounts.test.email != "test@example.com"
+    assert accounts.test.email == "other@example.com"
+  end
+end
+```
+
 ## Associations
 
 Associations can be made between data sets, reference the data set's

@@ -55,6 +55,5 @@ defmodule EctoFixtures.InsertionTest do
     assert %Pet{} = pets.boomer
     assert pets.boomer.name == "Boomer"
     assert pets.boomer.owner_id == owners.brian.id
-
   end
 end
