@@ -33,3 +33,13 @@ defmodule Pet do
     belongs_to :owner, Owner, references: :id
   end
 end
+
+defmodule Book do
+  use Ecto.Model
+
+  @primary_key false
+
+  schema "books" do
+    field :title
+  end
+end

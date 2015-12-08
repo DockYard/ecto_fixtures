@@ -25,8 +25,10 @@ defmodule EctoFixtures.Conditioner do
 
   defp _condition_primary_key(data, table_name, row_name) do
     model = data[table_name][:model]
-    [primary_key] = model.__schema__(:primary_key)
-    _generate_key_value(data, table_name, row_name, primary_key)
+    case model.__schema__(:primary_key) do
+      [primary_key] -> _generate_key_value(data, table_name, row_name, primary_key)
+      [] -> data
+    end
   end
 
   defp _generate_key_value(data, table_name, row_name, key) do
