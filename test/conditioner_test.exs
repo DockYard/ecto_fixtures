@@ -56,6 +56,22 @@ defmodule EctoFixtures.ConditionerTest do
     assert is_binary(data[:cars][:rows][:nissan][:data][:id])
   end
 
+  test "supports no primary key" do
+    data = [
+      books: %{
+        model: Book,
+        repo: Base,
+        rows: [one: %{data: %{title: "Go Dog Go!"}}]
+      }
+    ]
+
+    assert data[:books][:rows][:one][:id] == nil
+
+    data = EctoFixtures.condition(data)
+
+    assert data[:books][:rows][:one][:id] == nil
+  end
+
   test "don't generate id if one already exists" do
     data = [
       cars: %{
