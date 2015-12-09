@@ -11,7 +11,7 @@ defmodule EctoFixtures.Insertion do
 
   defp _insert({_type, %{data: _columns, virtual: true}}, rows, _attributes, _can_insert), do: rows
   defp _insert({type, %{data: columns}}, rows, attributes, can_insert) when can_insert == false do
-    Map.put(rows, type, Map.merge(attributes.model.__struct__, columns))
+    Map.put(rows, type, struct(attributes.model, columns))
   end
   defp _insert({type, %{}}=row, rows, attributes, can_insert) when can_insert == true do
     rows = _insert(row, rows, attributes, false)
