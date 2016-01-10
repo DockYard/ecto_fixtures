@@ -1,20 +1,22 @@
 defmodule EctoFixtures.Insertion do
-  def insert(data, can_insert) do
-    Enum.into data, %{}, fn({type, attributes}) ->
-      attributes = put_in attributes[:rows], Enum.reduce(attributes[:rows], %{}, fn(row, rows) ->
-        _insert(row, rows, attributes, can_insert)
-      end)
+  def insert(data, insert?) do
+    Enum.reduce data, %{}, fn({source, tables}, acc) ->
+      Enum.into tables, acc, fn({type, attributes}) ->
+        attributes = put_in attributes[:rows], Enum.reduce(attributes[:rows], %{}, fn(row, rows) ->
+          insert_row(row, rows, attributes, insert?)
+        end)
 
-      {type, attributes}
+        {type, attributes}
+      end
     end
   end
 
-  defp _insert({_type, %{data: _columns, virtual: true}}, rows, _attributes, _can_insert), do: rows
-  defp _insert({type, %{data: columns}}, rows, attributes, can_insert) when can_insert == false do
+  defp insert_row({_type, %{data: _columns, virtual: true}}, rows, _attributes, _insert?), do: rows
+  defp insert_row({type, %{data: columns}}, rows, attributes, insert?) when insert? == false do
     Map.put(rows, type, struct(attributes.model, columns))
   end
-  defp _insert({type, %{}}=row, rows, attributes, can_insert) when can_insert == true do
-    rows = _insert(row, rows, attributes, false)
+  defp insert_row({type, %{}}=row, rows, attributes, insert?) when insert? == true do
+    rows = insert_row(row, rows, attributes, false)
     Map.put(rows, type, attributes.repo.insert!(rows[type]))
   end
 end
