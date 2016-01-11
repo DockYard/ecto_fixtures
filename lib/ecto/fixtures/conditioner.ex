@@ -1,5 +1,9 @@
 defmodule EctoFixtures.Conditioner do
-  @max_id trunc(:math.pow(2, 30) - 1)
+  import EctoFixtures.Conditioners.Inheritance, only: [inheritance: 2]
+  import EctoFixtures.Conditioners.Override, only: [override: 2]
+  import EctoFixtures.Conditioners.PrimaryKey, only: [primary_key: 2, generate_key_value: 3]
+  import EctoFixtures.Conditioners.Associations, only: [associations: 2]
+  import EctoFixtures.Conditioners.FunctionCall, only: [function_call: 2]
 
   def condition(data, opts) do
     Enum.reduce data, data, fn({path, _}, data) ->
@@ -21,199 +25,14 @@ defmodule EctoFixtures.Conditioner do
 
   defp condition_row(data, path, opts) do
     data
-    |> condition_inheritance(path)
+    |> inheritance(path)
     |> override(opts)
-    |> condition_primary_key(path)
-    |> condition_associations(path)
-    |> condition_function_calls(path)
+    |> primary_key(path)
+    |> associations(path)
+    |> function_call(path)
   end
 
-  defp override(data, [source: source, override: %{}=override_data, reverse: reverse?]=opts) do
-    Enum.reduce override_data, data, fn({table_name, rows}, data) ->
-      case get_in(data, [source, table_name]) do
-        nil -> data
-        _ -> Enum.reduce rows, data, fn({row_name, columns}, data) ->
-          result = case get_in(data, [source, table_name, :rows, row_name]) do
-            nil -> data
-            _ ->
-              put_in(data, [source, table_name, :rows, row_name, :data], override_merge(get_in(data, [source, table_name, :rows, row_name, :data]), columns, reverse?))
-          end
-        end
-      end
-    end
-  end
-  defp override(data, [source: source, override: override_data]) when is_map(override_data), do:
-    override(data, [source: source, override: override_data, reverse: false])
-  defp override(data, _opts), do: data
-
-  defp override_merge(left, right, false) do
-    Map.merge(left, right)
-  end
-
-  defp override_merge(left, right, true) do
-    Map.merge(right, left)
-  end
-
-  defp condition_primary_key(data, path) do
-    table_path = path |> Enum.take(2)
-    model = get_in(data, table_path ++ [:model])
-    case model.__schema__(:primary_key) do
-      [primary_key] -> generate_key_value(data, path, primary_key)
-      [] -> data
-    end
-  end
-
-  defp generate_key_value(data, path, key) do
-    table_path = path |> Enum.take(2)
-    model = get_in(data, table_path ++ [:model])
-    key_path = path ++ [:data, key]
-    case get_in(data, key_path) |> is_nil() do
-      true ->
-        key_type = model.__schema__(:type, key)
-        name = Enum.join(key_path, "-")
-
-        value = case key_type do
-          :id -> generate_id_key_value(name)
-          :binary_id -> generate_binary_id_key_value(name)
-        end
-
-        put_in(data, key_path, value)
-      false -> data
-    end
-  end
-
-  defp generate_id_key_value(name) do
-    :zlib.crc32(:zlib.open, name)
-    |> rem(@max_id)
-  end
-
-  defp generate_binary_id_key_value(name) do
-    UUID.uuid5(:oid, name)
-  end
-
-  defp condition_associations(data, path) do
-    table_path = path |> Enum.take(2)
-    model = get_in(data, table_path ++ [:model])
-
-    model.__schema__(:associations)
-    |> Enum.reduce data, fn(association_name, data) ->
-      if get_in(data, path ++ [:data, association_name]) do
-        case model.__schema__(:association, association_name) do
-          %Ecto.Association.Has{} = association ->
-            has_association(data, path, association)
-          %Ecto.Association.BelongsTo{} = association ->
-            belongs_to_association(data, path, association)
-        end
-      else
-        data
-      end
-    end
-  end
-
-  defp has_association(data, path, %{cardinality: :one} = association) do
-    %{field: field, owner_key: owner_key, related_key: related_key} = association
-    association_path = get_in(data, path ++ [:data, field]) |> get_path
-    association_path = [List.first(path) | association_path]
-    data = generate_key_value(data, path, owner_key)
-    owner_key_value = get_in(data, path ++ [:data, owner_key])
-    put_in(data, association_path ++ [related_key], owner_key_value)
-    |> put_in(path ++ [:data], Map.delete(get_in(data, path ++ [:data]), field))
-  end
-
-  defp has_association(data, path, %{cardinality: :many} = association) do
-    %{field: field, owner_key: owner_key, related_key: related_key} = association
-    data = Enum.reduce get_in(data, path ++ [:data, field]), data, fn(association_expr, data) ->
-      association_path = get_path(association_expr)
-      association_path = [List.first(path) | association_path]
-      data = generate_key_value(data, path, owner_key)
-      owner_key_value = get_in(data, path ++ [:data, owner_key])
-      put_in(data, association_path ++ [related_key], owner_key_value)
-    end
-    put_in(data, path ++ [:data], Map.delete(get_in(data, path ++ [:data]), field))
-  end
-
-  defp belongs_to_association(data, path, association) do
-    %{field: field, owner_key: owner_key, related_key: related_key} = association
-    [related_table_name, _, related_row_name, _] = get_in(data, path ++ [:data, field]) |> get_path
-
-    related_path =
-      path
-      |> List.replace_at(1, related_table_name)
-      |> List.replace_at(3, related_row_name)
-
-    data = generate_key_value(data, related_path, related_key)
-    related_key_value = get_in(data, related_path ++ [:data, related_key])
-    data = put_in(data, path ++ [:data, owner_key], related_key_value)
-    put_in(data, path ++ [:data], Map.delete(get_in(data, path ++ [:data]), field))
-  end
-
-  defp get_path({{:., _, [{table_name, _, _}, row_name]}, _, _}) do
-    [table_name, :rows, row_name, :data]
-  end
-
-  defp condition_function_calls(data, path) do
-    Enum.reduce get_in(data, path ++ [:data]), data, fn({column, value}, data) ->
-      case value do
-        {_, _, _} ->
-          value =
-            value
-            |> Code.eval_quoted
-            |> elem(0)
-          put_in(data, path ++ [:data, column], value)
-        _ ->
-          data
-      end
-    end
-  end
-
-  defp condition_inheritance(data, path) do
-    if get_in(data, path) |> Map.has_key?(:inherits) do
-      put_in(data, path ++ [:data],
-        Map.merge(inherits_data(data, path, get_in(data, path ++ [:inherits])), get_in(data, path ++ [:data])))
-    else
-      data
-    end
-  end
-
-  defp inherits_data(data, path, {{:., _, [{{:., _, [{:fixtures, _, [file_path]}, other_table_name]}, _, _}, other_row_name]}, _, _}) do
-    other_source = "test/fixtures/#{file_path}.exs"
-    [source, table_name, :rows, row_name] = path
-
-    other_row_data = EctoFixtures.read(other_source)
-    |> EctoFixtures.parse
-    |> condition(source: source)
-    |> get_in([String.to_atom(other_source), other_table_name, :rows, other_row_name, :data])
-    |> Map.delete(:id)
-
-    other_data =
-      %{}
-      |> put_in([table_name], %{})
-      |> put_in([table_name, row_name], other_row_data)
-
-    override(data, [source: source, override: other_data, reverse: true])
-    |> get_in(path ++ [:data])
-  end
-
-  defp inherits_data(data, path, {{:., _, [{other_table_name, _, _}, other_row_name]}, _, _}) do
-    path =
-      path
-      |> List.replace_at(1, other_table_name)
-      |> List.replace_at(3, other_row_name)
-      |> List.insert_at(-1, :data)
-
-    get_in(data, path) |> escape_values
-  end
-
-  defp inherits_data(data, path, {other_row_name, _, _}) do
-    path =
-      path
-      |> List.replace_at(3, other_row_name)
-      |> List.insert_at(-1, :data)
-
-    get_in(data, path) |> escape_values
-  end
-
-  defp escape_values(map) do
+  def escape_values(map) do
     Enum.into map, %{}, fn({key, value}) -> {key, Macro.escape(value)} end
   end
 end
