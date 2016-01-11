@@ -7,17 +7,17 @@ defmodule EctoFixtures.Conditioner do
 
   def condition(data, opts) do
     Enum.reduce data, data, fn({path, _}, data) ->
-      condition_tables(data, [path], opts)
+      walk_tables(data, [path], opts)
     end
   end
 
-  def condition_tables(data, path, opts) do
+  def walk_tables(data, path, opts) do
     Enum.reduce get_in(data, path), data, fn({table_name, _}, data) ->
-      condition_table(data, path ++ [table_name, :rows], opts)
+      walk_rows(data, path ++ [table_name, :rows], opts)
     end
   end
 
-  defp condition_table(data, path, opts) do
+  defp walk_rows(data, path, opts) do
     Enum.reduce get_in(data, path), data, fn({row_name, _}, data) ->
       condition_row(data, path ++ [row_name], opts)
     end
