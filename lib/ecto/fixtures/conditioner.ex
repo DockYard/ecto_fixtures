@@ -1,7 +1,7 @@
 defmodule EctoFixtures.Conditioner do
   import EctoFixtures.Conditioners.Inheritance, only: [inheritance: 2]
   import EctoFixtures.Conditioners.Override, only: [override: 2]
-  import EctoFixtures.Conditioners.PrimaryKey, only: [primary_key: 2, generate_key_value: 3]
+  import EctoFixtures.Conditioners.PrimaryKey, only: [primary_key: 2]
   import EctoFixtures.Conditioners.Associations, only: [associations: 2]
   import EctoFixtures.Conditioners.FunctionCall, only: [function_call: 2]
 
