@@ -184,6 +184,19 @@ defmodule EctoFixtures.ConditionerTest do
     refute data[path][:owners][:rows][:brian][:data][:name] == data[path][:other_owners][:rows][:thomas][:data][:name]
   end
 
+  test "can inherit from other fixture files" do
+    path = "test/fixtures/inheritance_fixture.exs"
+    data = EctoFixtures.read(path)
+    |> EctoFixtures.parse
+    |> EctoFixtures.condition
+
+    path = String.to_atom(path)
+
+    assert data[path][:owners][:rows][:non_admin][:data][:admin] == false
+    assert data[path][:owners][:rows][:non_admin][:data][:name] == "Thomas"
+    assert data[path][:owners][:rows][:non_admin][:data][:viewed_profile] == true
+  end
+
   test "can override the values in the fixture file with optional map" do
     data = EctoFixtures.fixtures(:override, %{
       owners: %{

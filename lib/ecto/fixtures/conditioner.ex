@@ -21,27 +21,38 @@ defmodule EctoFixtures.Conditioner do
 
   defp condition_row(data, path, opts) do
     data
-    |> override(opts)
     |> condition_inheritance(path)
+    |> override(opts)
     |> condition_primary_key(path)
     |> condition_associations(path)
     |> condition_function_calls(path)
   end
 
-  defp override(data, [source: source, override: %{}=override_data]) do
+  defp override(data, [source: source, override: %{}=override_data, reverse: reverse?]=opts) do
     Enum.reduce override_data, data, fn({table_name, rows}, data) ->
       case get_in(data, [source, table_name]) do
         nil -> data
         _ -> Enum.reduce rows, data, fn({row_name, columns}, data) ->
           result = case get_in(data, [source, table_name, :rows, row_name]) do
             nil -> data
-            _ -> put_in(data, [source, table_name, :rows, row_name, :data], Map.merge(get_in(data, [source, table_name, :rows, row_name, :data]), columns))
+            _ ->
+              put_in(data, [source, table_name, :rows, row_name, :data], override_merge(get_in(data, [source, table_name, :rows, row_name, :data]), columns, reverse?))
           end
         end
       end
     end
   end
+  defp override(data, [source: source, override: override_data]) when is_map(override_data), do:
+    override(data, [source: source, override: override_data, reverse: false])
   defp override(data, _opts), do: data
+
+  defp override_merge(left, right, false) do
+    Map.merge(left, right)
+  end
+
+  defp override_merge(left, right, true) do
+    Map.merge(right, left)
+  end
 
   defp condition_primary_key(data, path) do
     table_path = path |> Enum.take(2)
@@ -141,11 +152,17 @@ defmodule EctoFixtures.Conditioner do
   end
 
   defp condition_function_calls(data, path) do
-    Enum.reduce get_in(data, path ++ [:data]) |> Map.keys(), data, fn(column, data) ->
-      value = get_in(data, path ++ [:data, column])
-      |> Code.eval_quoted
-      |> elem(0)
-      put_in(data, path ++ [:data, column], value)
+    Enum.reduce get_in(data, path ++ [:data]), data, fn({column, value}, data) ->
+      case value do
+        {_, _, _} ->
+          value =
+            value
+            |> Code.eval_quoted
+            |> elem(0)
+          put_in(data, path ++ [:data, column], value)
+        _ ->
+          data
+      end
     end
   end
 
@@ -156,6 +173,25 @@ defmodule EctoFixtures.Conditioner do
     else
       data
     end
+  end
+
+  defp inherits_data(data, path, {{:., _, [{{:., _, [{:fixtures, _, [file_path]}, other_table_name]}, _, _}, other_row_name]}, _, _}) do
+    other_source = "test/fixtures/#{file_path}.exs"
+    [source, table_name, :rows, row_name] = path
+
+    other_row_data = EctoFixtures.read(other_source)
+    |> EctoFixtures.parse
+    |> condition(source: source)
+    |> get_in([String.to_atom(other_source), other_table_name, :rows, other_row_name, :data])
+    |> Map.delete(:id)
+
+    other_data =
+      %{}
+      |> put_in([table_name], %{})
+      |> put_in([table_name, row_name], other_row_data)
+
+    override(data, [source: source, override: other_data, reverse: true])
+    |> get_in(path ++ [:data])
   end
 
   defp inherits_data(data, path, {{:., _, [{other_table_name, _, _}, other_row_name]}, _, _}) do
