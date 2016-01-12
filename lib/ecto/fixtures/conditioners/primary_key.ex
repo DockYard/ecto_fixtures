@@ -1,7 +1,7 @@
 defmodule EctoFixtures.Conditioners.PrimaryKey do
   @max_id trunc(:math.pow(2, 30) - 1)
 
-  def primary_key(data, path) do
+  def process(data, path) do
     table_path = path |> Enum.take(2)
     model = get_in(data, table_path ++ [:model])
     case model.__schema__(:primary_key) do

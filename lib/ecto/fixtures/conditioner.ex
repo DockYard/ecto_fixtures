@@ -1,11 +1,5 @@
 defmodule EctoFixtures.Conditioner do
-  import EctoFixtures.Conditioners.Inheritance, only: [inheritance: 2]
-  import EctoFixtures.Conditioners.Override, only: [override: 2]
-  import EctoFixtures.Conditioners.PrimaryKey, only: [primary_key: 2]
-  import EctoFixtures.Conditioners.Associations, only: [associations: 2]
-  import EctoFixtures.Conditioners.FunctionCall, only: [function_call: 2]
-
-  def condition(data, opts) do
+  def process(data, opts) do
     Enum.reduce data, data, fn({path, _}, data) ->
       walk_tables(data, [path], opts)
     end
@@ -25,11 +19,11 @@ defmodule EctoFixtures.Conditioner do
 
   defp condition_row(data, path, opts) do
     data
-    |> inheritance(path)
-    |> override(opts)
-    |> primary_key(path)
-    |> associations(path)
-    |> function_call(path)
+    |> EctoFixtures.Conditioners.Inheritance.process(path)
+    |> EctoFixtures.Conditioners.Override.process(opts)
+    |> EctoFixtures.Conditioners.PrimaryKey.process(path)
+    |> EctoFixtures.Conditioners.Associations.process(path)
+    |> EctoFixtures.Conditioners.FunctionCall.process(path)
   end
 
   def escape_values(map) do

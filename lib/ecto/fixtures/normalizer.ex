@@ -1,5 +1,5 @@
 defmodule EctoFixtures.Normalizer do
-  def normalize(data) do
+  def process(data) do
     Enum.into data, %{}, fn({type, attributes}) ->
       attributes = attributes
       |> Map.merge(attributes.rows)

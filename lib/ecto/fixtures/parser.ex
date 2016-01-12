@@ -1,5 +1,5 @@
 defmodule EctoFixtures.Parser do
-  def parse({path, content}) do
+  def process({path, content}) do
     {:ok, ast} = Code.string_to_quoted(content)
     Map.put(%{}, path, parse_ast(ast))
   end

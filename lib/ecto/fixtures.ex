@@ -1,9 +1,9 @@
 defmodule EctoFixtures do
   def read(file_path), do: {String.to_atom(file_path), File.read!(file_path)}
-  def parse(content), do: EctoFixtures.Parser.parse(content)
-  def condition(data, opts \\ []), do: EctoFixtures.Conditioner.condition(data, opts)
-  def insert(data, can_insert), do: EctoFixtures.Insertion.insert(data, can_insert)
-  def normalize(data), do: EctoFixtures.Normalizer.normalize(data)
+  def parse(content), do: EctoFixtures.Parser.process(content)
+  def condition(data, opts \\ []), do: EctoFixtures.Conditioner.process(data, opts)
+  def insert(data, can_insert), do: EctoFixtures.Insertion.process(data, can_insert)
+  def normalize(data), do: EctoFixtures.Normalizer.process(data)
 
   def fixtures(name) do
     fixtures(name, insert: true)

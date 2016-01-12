@@ -1,6 +1,6 @@
 defmodule EctoFixtures.Conditioners.Inheritance do
 
-  def inheritance(data, path) do
+  def process(data, path) do
     if get_in(data, path) |> Map.has_key?(:inherits) do
       put_in(data, path ++ [:data],
         Map.merge(inherits_data(data, path, get_in(data, path ++ [:inherits])), get_in(data, path ++ [:data])))
@@ -15,7 +15,7 @@ defmodule EctoFixtures.Conditioners.Inheritance do
 
     other_row_data = EctoFixtures.read(other_source)
     |> EctoFixtures.parse
-    |> EctoFixtures.Conditioner.condition(source: source)
+    |> EctoFixtures.Conditioner.process(source: source)
     |> get_in([String.to_atom(other_source), other_table_name, :rows, other_row_name, :data])
     |> Map.delete(:id)
 
@@ -24,7 +24,7 @@ defmodule EctoFixtures.Conditioners.Inheritance do
       |> put_in([table_name], %{})
       |> put_in([table_name, row_name], other_row_data)
 
-    EctoFixtures.Conditioners.Override.override(data, [source: source, override: other_data, reverse: true])
+    EctoFixtures.Conditioners.Override.process(data, [source: source, override: other_data, reverse: true])
     |> get_in(path ++ [:data])
   end
 

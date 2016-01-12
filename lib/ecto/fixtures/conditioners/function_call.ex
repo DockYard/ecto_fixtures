@@ -1,5 +1,5 @@
 defmodule EctoFixtures.Conditioners.FunctionCall do
-  def function_call(data, path) do
+  def process(data, path) do
     Enum.reduce get_in(data, path ++ [:data]), data, fn({column, value}, data) ->
       case value do
         {_, _, _} ->

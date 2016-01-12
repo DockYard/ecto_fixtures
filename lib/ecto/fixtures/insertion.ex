@@ -1,5 +1,5 @@
 defmodule EctoFixtures.Insertion do
-  def insert(data, insert?) do
+  def process(data, insert?) do
     Enum.reduce data, %{}, fn({source, tables}, acc) ->
       Enum.into tables, acc, fn({type, attributes}) ->
         attributes = put_in attributes[:rows], Enum.reduce(attributes[:rows], %{}, fn(row, rows) ->

@@ -1,7 +1,7 @@
 defmodule EctoFixtures.Conditioners.Associations do
   import EctoFixtures.Conditioners.PrimaryKey, only: [generate_key_value: 3]
 
-  def associations(data, path) do
+  def process(data, path) do
     table_path = path |> Enum.take(2)
     model = get_in(data, table_path ++ [:model])
 
