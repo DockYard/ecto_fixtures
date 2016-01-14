@@ -1,10 +1,9 @@
 defmodule EctoFixtures do
-  def read(path), do: File.read!(path)
-  def parse(content), do: EctoFixtures.Parser.parse(content)
-  def condition(data), do: EctoFixtures.Conditioner.condition(data)
-  def insert(data, can_insert), do: EctoFixtures.Insertion.insert(data, can_insert)
-  def normalize(data), do: EctoFixtures.Normalizer.normalize(data)
-  def override(data, override_data), do: EctoFixtures.Overrider.override(data, override_data)
+  def read(file_path), do: {String.to_atom(file_path), File.read!(file_path)}
+  def parse(content), do: EctoFixtures.Parser.process(content)
+  def condition(data, opts \\ []), do: EctoFixtures.Conditioner.process(data, opts)
+  def insert(data, can_insert), do: EctoFixtures.Insertion.process(data, can_insert)
+  def normalize(data), do: EctoFixtures.Normalizer.process(data)
 
   def fixtures(name) do
     fixtures(name, insert: true)
@@ -15,11 +14,11 @@ defmodule EctoFixtures do
   end
 
   def fixtures(name, opts) do
-    read("test/fixtures/#{name}.exs")
+    source = "test/fixtures/#{name}.exs"
+
+    read(source)
     |> parse
-    |> condition
-    |> override(opts[:override])
+    |> condition(source: String.to_atom(source), override: opts[:override])
     |> insert(opts[:insert])
-    |> normalize
   end
 end

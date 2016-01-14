@@ -160,6 +160,34 @@ events model: Event, repo: Repo do
 end
 ```
 
+### Between other fixtures files
+
+Associations can also be made between fixture files:
+
+```elixir
+# test/fixtures/accounts.exs
+accounts model: Account, repo: Repo do
+  brian do
+    name "Brian"
+    pet fixtures(:pets).pets.boomer
+  end
+end
+
+# test/fixtures/pets.exs
+pets model: Pet, repo: Repo do
+  boomer do
+    name "Boomer"
+  end
+end
+```
+
+### Handling Foreign Key Constraints
+
+ecto_fixtures will determine the assocation type being made and ensure
+that child records are always inserted *after* the parent record to
+avoid any foreign key constraint issues, regardless of the order in
+which the fixtures are loaded. 
+
 ## Inheriting Data
 
 If you'd like to have default values inherited into other rows you can
@@ -187,6 +215,29 @@ end
 When inheriting from rows in the same group you can simply refer to the
 row name. When referring to rows in other groups you have to refer to
 the group name and table name.
+
+You can inherit data from other fixture files as well:
+
+```elixir
+# test/fixtures/accounts.exs
+accounts model: Account, repo: Repo do
+  default do
+    is_admin false
+  end
+
+  brian inherits: default do
+    name "Brian"
+  end
+end
+
+# test/fixtures/other_accounts.exs
+other_accounts: Account, repo: Repo do
+  stephanie inherits: fixtures(:accounts).accounts.default do
+    name "Stephanie"
+    is_admin true
+  end
+end
+```
 
 Inherited values can be overriden by defining values on the same column.
 

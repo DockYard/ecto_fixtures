@@ -1,10 +1,8 @@
-defmodule EctoFixtures.OverrideTest do
+defmodule EctoFixtures.Conditioners.OverrideTest do
   use EctoFixtures.Integration.Case
-  import EctoFixtures, only: [fixtures: 2]
 
-  @tag timeout: 1_000_000_000
   test "can override the values in the fixture file with optional map" do
-    data = fixtures(:override, %{
+    data = EctoFixtures.fixtures(:override, %{
       owners: %{
         one: %{
           name: "Stephanie",
