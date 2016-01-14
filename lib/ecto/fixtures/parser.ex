@@ -12,14 +12,13 @@ defmodule EctoFixtures.Parser do
   end
 
   defp parse_tables(tables) do
-    Enum.reduce tables, [], fn(table, acc) ->
+    Enum.into tables, %{}, fn(table) ->
       parse_table(table)
-      |> Keyword.merge(acc)
     end
   end
 
   defp parse_table({name, _, table_data}) do
-    [{name, parse_table_arguments(table_data)}]
+    {name, parse_table_arguments(table_data)}
   end
 
   defp parse_table_arguments([[do: {:__block__, [], rows}]]=arguments) when length(arguments) == 1 do
@@ -39,14 +38,10 @@ defmodule EctoFixtures.Parser do
     |> Map.merge(parse_table_options(tail))
   end
 
-  defp parse_table_rows([]), do: []
-  defp parse_table_rows([row|tail]) do
-    parse_table_rows(tail)
-    |> Keyword.merge(parse_row(row))
-  end
-
-  defp parse_row({name, _, args}) do
-    [{name, parse_row_args(args)}]
+  defp parse_table_rows(rows) do
+    Enum.into rows, %{}, fn({name, _, args}) ->
+      {name, parse_row_args(args)}
+    end
   end
 
   defp parse_row_args([]), do: %{}
