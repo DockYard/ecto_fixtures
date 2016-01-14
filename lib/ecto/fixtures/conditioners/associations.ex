@@ -25,8 +25,10 @@ defmodule EctoFixtures.Conditioners.Associations do
     { data, association_path } = get_path(data, path, get_in(data, path ++ [:data, field]))
     data = generate_key_value(data, path, owner_key)
     owner_key_value = get_in(data, path ++ [:data, owner_key])
-    put_in(data, association_path ++ [related_key], owner_key_value)
+    put_in(data, association_path ++ [:data, related_key], owner_key_value)
     |> put_in(path ++ [:data], Map.delete(get_in(data, path ++ [:data]), field))
+    |> EctoFixtures.Conditioners.DAG.add_vertex(association_path, get_in(data, [:__DAG__]))
+    |> EctoFixtures.Conditioners.DAG.add_edge(path, association_path)
   end
 
   defp has_association(data, path, %{cardinality: :many} = association) do
@@ -35,7 +37,9 @@ defmodule EctoFixtures.Conditioners.Associations do
       { data, association_path } = get_path(data, path, association_expr)
       data = generate_key_value(data, path, owner_key)
       owner_key_value = get_in(data, path ++ [:data, owner_key])
-      put_in(data, association_path ++ [related_key], owner_key_value)
+      put_in(data, association_path ++ [:data, related_key], owner_key_value)
+      |> EctoFixtures.Conditioners.DAG.add_vertex(association_path, get_in(data, [:__DAG__]))
+      |> EctoFixtures.Conditioners.DAG.add_edge(path, association_path)
     end
     put_in(data, path ++ [:data], Map.delete(get_in(data, path ++ [:data]), field))
   end
@@ -44,12 +48,12 @@ defmodule EctoFixtures.Conditioners.Associations do
     %{field: field, owner_key: owner_key, related_key: related_key} = association
     {data, association_path} = get_path(data, path, get_in(data, path ++ [:data, field]))
 
-    association_path = List.delete(association_path, :data)
-
     data = generate_key_value(data, association_path, related_key)
     related_key_value = get_in(data, association_path ++ [:data, related_key])
     data = put_in(data, path ++ [:data, owner_key], related_key_value)
     put_in(data, path ++ [:data], Map.delete(get_in(data, path ++ [:data]), field))
+    |> EctoFixtures.Conditioners.DAG.add_vertex(association_path, get_in(data, [:__DAG__]))
+    |> EctoFixtures.Conditioners.DAG.add_edge(association_path, path)
   end
 
   defp get_path(data, path, {{:., _, [{{:., _, [{:fixtures, _, [file_path]}, other_table_name]}, _, _}, other_row_name]}, _, _}) do
@@ -67,36 +71,12 @@ defmodule EctoFixtures.Conditioners.Associations do
       |> put_in([other_source_atom], [])
       |> put_in([other_source_atom, other_table_name], %{rows: [{other_row_name, other_row_data}]})
 
-    { deep_merge(data, other_data),
-      [other_source_atom, other_table_name, :rows, other_row_name, :data] }
+    { EctoFixtures.Utils.deep_merge(data, other_data),
+      [other_source_atom, other_table_name, :rows, other_row_name] }
   end
 
   defp get_path(data, path, {{:., _, [{other_table_name, _, _}, other_row_name]}, _, _}) do
     source = List.first(path)
-    { data, [source, other_table_name, :rows, other_row_name, :data] }
+    { data, [source, other_table_name, :rows, other_row_name] }
   end
-
-  def deep_merge(left, right) when is_map(left) and is_map(right) do
-    Enum.into right, left, fn({key, value}) ->
-      if Map.has_key?(left, key) do
-        {key, deep_merge(left[key], value)}
-      else
-        {key, value}
-      end
-    end
-  end
-
-  def deep_merge(left, right) when is_list(left) and is_list(right) do
-    Enum.reduce right, left, fn({key, value}, data) ->
-      tuple = if Keyword.has_key?(data, key) do
-        {key, deep_merge(left[key], value)}
-      else
-        {key, value}
-      end
-
-      Keyword.merge(data, Keyword.new([tuple]))
-    end
-  end
-
-  def deep_merge(left, right), do: right
 end

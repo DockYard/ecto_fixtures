@@ -19,6 +19,7 @@ defmodule EctoFixtures.Conditioner do
 
   defp condition_row(data, path, opts) do
     data
+    |> EctoFixtures.Conditioners.DAG.process(path)
     |> EctoFixtures.Conditioners.Inheritance.process(path)
     |> EctoFixtures.Conditioners.Override.process(opts)
     |> EctoFixtures.Conditioners.PrimaryKey.process(path)

@@ -20,6 +20,5 @@ defmodule EctoFixtures do
     |> parse
     |> condition(source: String.to_atom(source), override: opts[:override])
     |> insert(opts[:insert])
-    |> normalize
   end
 end

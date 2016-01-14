@@ -6,21 +6,22 @@ defmodule EctoFixtures.InsertionTest do
     fixtures(:insert_1)
 
     cars = BaseRepo.all(Car)
+    nissan = cars |> Enum.find(fn(car) -> car.color == "black" end)
+    tesla = cars |> Enum.find(fn(car) -> car.color == "red" end)
+    toyota = cars |> Enum.find(fn(car) -> car.color == "white" end)
+
     owners = BaseRepo.all(Owner)
+    brian = owners |> Enum.find(fn(owner) -> owner.name == "Brian" end)
+    stephanie = owners |> Enum.find(fn(owner) -> owner.name == "Stephanie" end)
+
     pets = BaseRepo.all(Pet)
+    boomer = pets |> Enum.find(fn(pet) -> pet.name == "Boomer" end)
 
-    assert Enum.at(cars, 0).color == "black"
-    assert Enum.at(cars, 0).owner_id == Enum.at(owners, 0).id
-    assert Enum.at(cars, 1).color == "red"
-    assert Enum.at(cars, 1).owner_id == Enum.at(owners, 1).id
-    assert Enum.at(cars, 2).color == "white"
-    assert Enum.at(cars, 2).owner_id == Enum.at(owners, 1).id
+    assert nissan.owner_id == brian.id
+    assert tesla.owner_id == stephanie.id
+    assert toyota.owner_id == stephanie.id
 
-    assert Enum.at(owners, 0).name == "Brian"
-    assert Enum.at(owners, 1).name == "Stephanie"
-
-    assert Enum.at(pets, 0).name == "Boomer"
-    assert Enum.at(pets, 0).owner_id == Enum.at(owners, 0).id
+    assert boomer.owner_id == brian.id
   end
 
   test "does not insert rows tagged with `virtual: true`" do
