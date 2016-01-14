@@ -29,6 +29,9 @@ defmodule EctoFixtures.Conditioners.AssociationsTest do
 
     assert is_integer(data[other_path][:pets][:rows][:boomer][:data][:owner_id])
     refute Map.has_key?(data[path][:owners][:rows][:brian][:data], :pet)
+
+    assert data[other_path][:pets][:model] == Pet
+    assert data[other_path][:pets][:repo] == Base
   end
 
   test "sets foreign key for belongs_to association properly and removes association" do
@@ -62,6 +65,9 @@ defmodule EctoFixtures.Conditioners.AssociationsTest do
     assert is_integer(data[path][:pets][:rows][:boomer][:data][:owner_id])
     refute Map.has_key?(data[path][:pets][:rows][:boomer][:data], :owner)
     assert data[other_path][:owners][:rows][:brian][:data][:name] == "Brian"
+
+    assert data[other_path][:owners][:model] == Owner
+    assert data[other_path][:owners][:repo] == Base
   end
 
   test "sets foreign key for has_many association properly and removes association" do
@@ -100,5 +106,8 @@ defmodule EctoFixtures.Conditioners.AssociationsTest do
     assert is_integer(data[other_path][:cars][:rows][:nissan][:data][:owner_id])
     assert is_integer(data[other_path][:cars][:rows][:tesla][:data][:owner_id])
     refute Map.has_key?(data[path][:owners][:rows][:brian][:data], :cars)
+
+    assert data[other_path][:cars][:model] == Car
+    assert data[other_path][:cars][:repo] == Base
   end
 end

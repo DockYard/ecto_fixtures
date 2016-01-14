@@ -60,15 +60,23 @@ defmodule EctoFixtures.Conditioners.Associations do
     other_source_atom = String.to_atom(other_source)
     [source, _table_name, :rows, _row_name] = path
 
-    other_row_data = EctoFixtures.read(other_source)
+    other_source_data = EctoFixtures.read(other_source)
     |> EctoFixtures.parse
     |> EctoFixtures.Conditioner.process(source: source)
-    |> get_in([other_source_atom, other_table_name, :rows, other_row_name])
 
-    other_data =
-      %{}
-      |> put_in([other_source_atom], [])
-      |> put_in([other_source_atom, other_table_name], %{rows: [{other_row_name, other_row_data}]})
+    other_source_info = get_in(other_source_data, [other_source_atom, other_table_name])
+
+    other_data = %{
+      other_source_atom => %{
+        other_table_name => %{
+          model: get_in(other_source_data, [other_source_atom, other_table_name, :model]),
+          repo: get_in(other_source_data, [other_source_atom, other_table_name, :repo]),
+          rows: %{
+            other_row_name => get_in(other_source_data, [other_source_atom, other_table_name, :rows, other_row_name])
+          }
+        }
+      }
+    }
 
     { EctoFixtures.Utils.deep_merge(data, other_data),
       [other_source_atom, other_table_name, :rows, other_row_name] }
