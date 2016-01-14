@@ -5,8 +5,7 @@ defmodule EctoFixtures.Conditioners.Associations do
     table_path = path |> Enum.take(2)
     model = get_in(data, table_path ++ [:model])
 
-    model.__schema__(:associations)
-    |> Enum.reduce data, fn(association_name, data) ->
+    Enum.reduce model.__schema__(:associations), data, fn(association_name, data) ->
       if get_in(data, path ++ [:data, association_name]) do
         case model.__schema__(:association, association_name) do
           %Ecto.Association.Has{} = association ->

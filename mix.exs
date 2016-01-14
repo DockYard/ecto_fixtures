@@ -4,7 +4,7 @@ defmodule EctoFixtures.Mixfile do
   def project do
     [app: :ecto_fixtures,
      version: "0.0.2",
-     elixir: "~> 1.0",
+     elixir: "~> 1.2",
      name: "Ecto Fixtures",
      deps: deps,
      package: package,
