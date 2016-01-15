@@ -3,7 +3,7 @@ ExUnit.start
 
 Code.require_file "./support/models.exs", __DIR__
 Code.require_file "./support/repo.exs", __DIR__
-Code.require_file "./support/migration.exs", __DIR__
+Code.require_file "./support/migrations.exs", __DIR__
 
 defmodule EctoFixtures.Integration.Case do
   use ExUnit.CaseTemplate
