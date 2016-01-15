@@ -1,5 +1,5 @@
 defmodule Car do
-  use Ecto.Model
+  use Ecto.Schema
 
   @primary_key {:id, :binary_id, []}
 
@@ -10,7 +10,7 @@ defmodule Car do
 end
 
 defmodule Owner do
-  use Ecto.Model
+  use Ecto.Schema
 
   schema "owners" do
     field :name
@@ -22,7 +22,7 @@ defmodule Owner do
 end
 
 defmodule Pet do
-  use Ecto.Model
+  use Ecto.Schema
 
   @primary_key {:woof, :id, []}
 
@@ -35,7 +35,7 @@ defmodule Pet do
 end
 
 defmodule Book do
-  use Ecto.Model
+  use Ecto.Schema
 
   @primary_key false
 
