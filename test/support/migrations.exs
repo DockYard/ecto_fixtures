@@ -5,6 +5,7 @@ defmodule EctoFixtures.Migrations do
     create table(:owners) do
       add :name, :string
       add :age, :integer
+      add :joined_on, :date
     end
 
     create table(:cars, primary_key: false) do
