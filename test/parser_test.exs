@@ -22,7 +22,7 @@ defmodule EctoFixtures.ParserTest do
         repo: Base,
         rows: %{
           brian: %{
-            data: %{name: "Brian", age: 35, joined_on: %Ecto.Date{year: 1990, month: 5, day: 5}}
+            data: %{name: "Brian", age: 35, joined_on: %Ecto.Date{year: 1990, month: 5, day: 4}}
           }
         }
       }

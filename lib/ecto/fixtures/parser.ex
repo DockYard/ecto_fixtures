@@ -59,6 +59,7 @@ defmodule EctoFixtures.Parser do
 
   defp parse_columns([]), do: %{}
   defp parse_columns([{field, _, [value]}|tail]) do
+    {value, _} = value |> Code.eval_quoted
     Map.put(%{}, field, value)
     |> Map.merge(parse_columns(tail))
   end
