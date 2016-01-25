@@ -57,4 +57,19 @@ defmodule EctoFixtures.InsertionTest do
     assert pets.boomer.name == "Boomer"
     assert pets.boomer.owner_id == owners.brian.id
   end
+
+  test "inserts has_one through relationships in correct order" do
+    data = fixtures("associations/has_one/through/import")
+
+    assert BaseRepo.preload(data.posts.foo, :tag).tag == data.tags.bar
+  end
+
+  test "inserts has_many through relationships in correct order" do
+    data = fixtures("associations/has_many/through/import")
+
+    post = BaseRepo.preload(data.posts.foo, :tags)
+
+    assert Enum.member?(post.tags, data.tags.bar)
+    assert Enum.member?(post.tags, data.tags.baz)
+  end
 end
