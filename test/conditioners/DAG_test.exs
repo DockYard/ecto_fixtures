@@ -2,8 +2,8 @@ defmodule EctoFixtures.Conditioners.DAGTest do
   use ExUnit.Case
 
   test "inserts DAG into payload" do
-    path = "test/fixtures/conditioner.exs"
-    data = EctoFixtures.read(path)
+    source = "test/fixtures/conditioner.exs"
+    data = EctoFixtures.read(source)
     |> EctoFixtures.parse
     |> EctoFixtures.condition
 
