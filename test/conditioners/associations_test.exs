@@ -142,6 +142,35 @@ defmodule EctoFixtures.Conditioners.AssociationsTest do
     refute Map.has_key?(data[source][:owners][:rows][:brian][:data], :cars)
   end
 
+  test "sets foreign key for has_many through association properly and removes association" do
+    source = "test/fixtures/associations/has_many/through.exs"
+    data = EctoFixtures.read(source)
+    |> EctoFixtures.parse
+
+    source = String.to_atom(source)
+
+    assert is_nil(data[source][:post_tags])
+    assert Map.has_key?(data[source][:posts][:rows][:foo][:data], :tags)
+
+    data = EctoFixtures.condition(data)
+
+    path = [source, :posts, :rows, :foo]
+    inverse_path = [source, :tags, :rows]
+
+    through_row_name = fn(name) ->
+      (Enum.join(path, "-") <> ":" <> Enum.join(inverse_path ++ [name], "-"))
+      |> String.to_atom()
+    end
+
+    assert is_integer(data[source][:posts_tags][:rows][through_row_name.(:bar)][:data][:post_id])
+    assert is_integer(data[source][:posts_tags][:rows][through_row_name.(:bar)][:data][:tag_id])
+
+    assert is_integer(data[source][:posts_tags][:rows][through_row_name.(:baz)][:data][:post_id])
+    assert is_integer(data[source][:posts_tags][:rows][through_row_name.(:baz)][:data][:tag_id])
+
+    refute Map.has_key?(data[source][:posts][:rows][:foo][:data], :tag)
+  end
+
   test "imports data from inverse fixture file for has_many association that references inverse file" do
     source = "test/fixtures/associations/has_many/import.exs"
     inverse_source = "test/fixtures/associations/has_many/import_dep.exs"
@@ -163,5 +192,35 @@ defmodule EctoFixtures.Conditioners.AssociationsTest do
 
     assert data[inverse_source][:cars][:model] == Car
     assert data[inverse_source][:cars][:repo] == Base
+  end
+
+  test "imports data from inverse fixture file for has_many through association that references inverse file" do
+    source = "test/fixtures/associations/has_many/through/import.exs"
+    inverse_source = "test/fixtures/associations/has_many/through/import_dep.exs"
+    data = EctoFixtures.read(source)
+    |> EctoFixtures.parse
+
+    source = String.to_atom(source)
+
+    assert is_nil(data[source][:post_tags])
+    assert Map.has_key?(data[source][:posts][:rows][:foo][:data], :tags)
+
+    data = EctoFixtures.condition(data)
+
+    path = [source, :posts, :rows, :foo]
+    inverse_path = [inverse_source, :tags, :rows]
+
+    through_row_name = fn(name) ->
+      (Enum.join(path, "-") <> ":" <> Enum.join(inverse_path ++ [name], "-"))
+      |> String.to_atom()
+    end
+
+    assert is_integer(data[source][:posts_tags][:rows][through_row_name.(:bar)][:data][:post_id])
+    assert is_integer(data[source][:posts_tags][:rows][through_row_name.(:bar)][:data][:tag_id])
+
+    assert is_integer(data[source][:posts_tags][:rows][through_row_name.(:baz)][:data][:post_id])
+    assert is_integer(data[source][:posts_tags][:rows][through_row_name.(:baz)][:data][:tag_id])
+
+    refute Map.has_key?(data[source][:posts][:rows][:foo][:data], :tag)
   end
 end

@@ -63,4 +63,13 @@ defmodule EctoFixtures.InsertionTest do
 
     assert BaseRepo.preload(data.posts.foo, :tag).tag == data.tags.bar
   end
+
+  test "inserts has_many through relationships in correct order" do
+    data = fixtures("associations/has_many/through/import")
+
+    post = BaseRepo.preload(data.posts.foo, :tags)
+
+    assert Enum.member?(post.tags, data.tags.bar)
+    assert Enum.member?(post.tags, data.tags.baz)
+  end
 end

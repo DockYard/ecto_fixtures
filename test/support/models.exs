@@ -54,7 +54,7 @@ defmodule Post do
     has_many :tags, through: [:posts_tags, :tag]
 
     has_one :post_tag, PostTag
-    has_one :tag, through: [:post_tag, :tag]
+    has_one :tag, through: [:post_tag, :tag], inverse_of: :post
   end
 end
 
@@ -81,6 +81,12 @@ defmodule Tag do
 
   schema "tags" do
     field :name
+
+    has_many :posts_tags, PostsTag
+    has_many :posts, through: [:posts_tags, :post]
+
+    has_one :post_tag, PostTag
+    has_one :post, through: [:post_tag, :post]
   end
 end
 
