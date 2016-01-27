@@ -24,11 +24,17 @@ defmodule EctoFixtures do
 
   defmacro __using__([]) do
     quote do
+      Module.register_attribute(__MODULE__, :fixtures, accumulate: true)
       import EctoFixtures, only: [fixtures: 1, fixtures: 2]
+      @before_compile EctoFixtures
+    end
+  end
 
+  defmacro __before_compile__(env) do
+    quote do
       setup context do
         data =
-          context[:fixtures]
+          unquote(Module.get_attribute(env.module, :fixtures))
           |> List.wrap()
           |> Enum.reduce(%{}, fn(source, data) ->
             EctoFixtures.Utils.deep_merge(data, EctoFixtures.fixtures(source))
