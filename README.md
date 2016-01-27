@@ -22,17 +22,17 @@ end
 ```
 
 In your test file you can access the fixture sets with the
-`EctoFixtures.fixture/1` function:
+by tagging each test with the fixtures you want to load then 
+pattern matching on the `data` field for the `context` argument.
 
 ```elixir
 defmodule MyTestCase do
   use ExUnit.Case
-  import EctoFixtures, only: [fixtures: 1]
+  use EctoFixtures
 
-  test "data test" do
-    %{accounts: accounts} = fixtures(:accounts)
-
-    assert accounts.test.email == "test@example.com"
+  @tag fixtures: :accounts
+  test "data test", %{data: data}  do
+    assert data.accounts.test.email == "test@example.com"
   end
 end
 ```
@@ -44,12 +44,10 @@ returned from `fixtures/1` is actually an `Ecto.Model`.
 ```elixir
 defmodule MyTestCase do
   use ExUnit.Case
-  import EctoFixtures, only: [fixtures: 1]
+  use EctoFixtures
 
-  test "database data is inserted and equal to data set" do
-    %{accounts: accounts} = fixtures(:accounts)
-
-    assert accounts.test == Repo.get(Account, accounts.test.id)
+  test "database data is inserted and equal to data set", %{data: data} do
+    assert data.accounts.test == Repo.get(Account, accounts.test.id)
   end
 end
 ```
