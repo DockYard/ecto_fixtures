@@ -21,4 +21,21 @@ defmodule EctoFixtures do
     |> condition(source: String.to_atom(source), override: opts[:override])
     |> insert(opts[:insert])
   end
+
+  defmacro __using__([]) do
+    quote do
+      import EctoFixtures, only: [fixtures: 1, fixtures: 2]
+
+      setup context do
+        data =
+          context[:fixtures]
+          |> List.wrap()
+          |> Enum.reduce(%{}, fn(source, data) ->
+            EctoFixtures.Utils.deep_merge(data, EctoFixtures.fixtures(source))
+          end)
+
+        {:ok, [data: data]}
+      end
+    end
+  end
 end
