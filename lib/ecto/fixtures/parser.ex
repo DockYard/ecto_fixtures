@@ -27,6 +27,8 @@ defmodule EctoFixtures.Parser do
   defp parse_table_arguments([[do: row]]) when is_tuple(row) do
     parse_table_rows([row])
   end
+  defp parse_table_arguments([[do: nil]]),
+    do: parse_table_rows([])
   defp parse_table_arguments([options|tail]=arguments) when length(arguments) > 1 do
     %{rows: parse_table_arguments(tail)}
     |> Map.merge(parse_table_options(options))
@@ -45,6 +47,8 @@ defmodule EctoFixtures.Parser do
   end
 
   defp parse_row_args([]), do: %{}
+  defp parse_row_args([[do: nil] | tail]),
+    do: parse_row_args([[do: {:__block__, nil, []}] | tail])
   defp parse_row_args([[do: {:__block__, _, columns}]|tail]) do
     parse_row_args(tail)
     |> Map.merge(%{data: parse_columns(columns)})

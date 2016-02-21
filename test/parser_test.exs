@@ -134,4 +134,42 @@ defmodule EctoFixtures.ParserTest do
       }
     }}
   end
+
+  test "when grouping is empty" do
+    fixture = """
+    owners model: Owner, repo: BaseRepo do
+    end
+    """
+
+    map = EctoFixtures.parse({:foo, fixture})
+
+    assert map == %{foo: %{
+      owners: %{
+        model: Owner,
+        repo: BaseRepo,
+        rows: %{}
+      }
+    }}
+  end
+
+  test "when row is empty" do
+    fixture = """
+    owners model: Owner, repo: BaseRepo do
+      brian do
+      end
+    end
+    """
+
+    map = EctoFixtures.parse({:foo, fixture})
+
+    assert map == %{foo: %{
+      owners: %{
+        model: Owner,
+        repo: BaseRepo,
+        rows: %{
+          brian: %{data: %{}}
+        }
+      }
+    }}
+  end
 end
