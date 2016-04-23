@@ -2,7 +2,7 @@
 
 Fixtures for Ecto
 
-[![Build Status](https://secure.travis-ci.org/dockyard/ecto_fixtures.svg?branch=master)](http://travis-ci.org/dockyard/ecto_fixtures)
+[![Build Status](https://secure.travis-ci.org/DockYard/ecto_fixtures.svg?branch=master)](http://travis-ci.org/dockyard/ecto_fixtures)
 
 ## Usage ##
 
