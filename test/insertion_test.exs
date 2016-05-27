@@ -72,4 +72,8 @@ defmodule EctoFixtures.InsertionTest do
     assert Enum.member?(post.tags, data.tags.bar)
     assert Enum.member?(post.tags, data.tags.baz)
   end
+
+  test "inserts from deeply nested associations" do
+    fixtures("dag/deep/invoices")
+  end
 end
