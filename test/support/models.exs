@@ -122,3 +122,33 @@ defmodule Appointment do
     belongs_to :patient, Patient
   end
 end
+
+defmodule User do
+  use Ecto.Schema
+
+  schema "users" do
+  end
+end
+
+defmodule Property do
+  use Ecto.Schema
+
+  schema "properties" do
+    field :name
+
+    belongs_to :owner, User
+    belongs_to :renter, User
+  end
+end
+
+defmodule Invoice do
+  use Ecto.Schema
+
+  schema "invoices" do
+    field :name
+
+    belongs_to :property, Property
+    belongs_to :owner, User
+    belongs_to :renter, User
+  end
+end
