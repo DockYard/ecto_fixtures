@@ -51,5 +51,18 @@ defmodule EctoFixtures.Migrations do
       add :post_id, references(:posts)
       add :tag_id, references(:tags)
     end
+
+    create table(:users)
+
+    create table(:properties) do
+      add :renter_id, references(:users)
+      add :owner_id, references(:users)
+    end
+
+    create table(:invoices) do
+      add :property_id, references(:properties)
+      add :renter_id, references(:users)
+      add :owner_id, references(:users)
+    end
   end
 end
