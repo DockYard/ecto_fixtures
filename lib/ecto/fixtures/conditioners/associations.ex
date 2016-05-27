@@ -118,6 +118,7 @@ defmodule EctoFixtures.Conditioners.Associations do
       inverse_source
       |> EctoFixtures.read()
       |> EctoFixtures.parse()
+      |> filter_by([inverse_source_atom, inverse_table_name, :rows, inverse_row_name])
       |> Map.put(:__DAG__, get_in(data, [:__DAG__]))
       |> EctoFixtures.Conditioner.process(source: source)
 
@@ -140,6 +141,16 @@ defmodule EctoFixtures.Conditioners.Associations do
   defp get_path(data, path, {{:., _, [{inverse_table_name, _, _}, inverse_row_name]}, _, _}) do
     source = List.first(path)
     { data, [source, inverse_table_name, :rows, inverse_row_name] }
+  end
+
+  defp filter_by(data, [file_path, table_name, :rows, row_name] = path) do
+    filtered_row = get_in(data, path)
+    filtered_data =
+      data
+      |> get_in([file_path, table_name])
+      |> put_in([:rows], %{row_name => filtered_row})
+
+    %{file_path => %{table_name => filtered_data}}
   end
 
   defp delete_in(data, path) do

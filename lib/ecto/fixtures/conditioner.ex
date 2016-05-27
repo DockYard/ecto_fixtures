@@ -2,9 +2,9 @@ defmodule EctoFixtures.Conditioner do
   def process(data, opts) do
     data
     |> Map.delete(:__DAG__)
-    |> Enum.reduce data, fn({path, _}, data) ->
+    |> Enum.reduce(data, fn({path, _}, data) ->
       walk_tables(data, [path], opts)
-    end
+    end)
   end
 
   def walk_tables(data, path, opts) do
