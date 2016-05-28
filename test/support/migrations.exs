@@ -64,5 +64,11 @@ defmodule EctoFixtures.Migrations do
       add :renter_id, references(:users)
       add :owner_id, references(:users)
     end
+
+    create table(:payments) do
+      add :invoice_id, references(:invoices)
+      add :payee_id, references(:users)
+      add :payer_id, references(:users)
+    end
   end
 end

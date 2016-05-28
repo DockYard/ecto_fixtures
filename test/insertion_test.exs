@@ -76,4 +76,8 @@ defmodule EctoFixtures.InsertionTest do
   test "inserts from deeply nested associations" do
     fixtures("dag/deep/invoices")
   end
+
+  test "inserts from deeply nested associations with passively references assciation" do
+    fixtures("dag/deep/payments")
+  end
 end
