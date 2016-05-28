@@ -114,25 +114,13 @@ defmodule EctoFixtures.Conditioners.Associations do
     inverse_source_atom = String.to_atom(inverse_source)
     [source, _table_name, :rows, _row_name] = path
 
-    inverse_source_data =
+    inverse_data =
       inverse_source
       |> EctoFixtures.read()
       |> EctoFixtures.parse()
       |> filter_by([inverse_source_atom, inverse_table_name, :rows, inverse_row_name])
       |> Map.put(:__DAG__, get_in(data, [:__DAG__]))
       |> EctoFixtures.Conditioner.process(source: source)
-
-    inverse_data = %{
-      inverse_source_atom => %{
-        inverse_table_name => %{
-          model: get_in(inverse_source_data, [inverse_source_atom, inverse_table_name, :model]),
-          repo: get_in(inverse_source_data, [inverse_source_atom, inverse_table_name, :repo]),
-          rows: %{
-            inverse_row_name => get_in(inverse_source_data, [inverse_source_atom, inverse_table_name, :rows, inverse_row_name])
-          }
-        }
-      }
-    }
 
     { EctoFixtures.Utils.deep_merge(data, inverse_data),
       [inverse_source_atom, inverse_table_name, :rows, inverse_row_name] }

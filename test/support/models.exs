@@ -148,3 +148,13 @@ defmodule Invoice do
     belongs_to :renter, User
   end
 end
+
+defmodule Payment do
+  use Ecto.Schema
+
+  schema "payments" do
+    belongs_to :invoice, Invoice
+    belongs_to :payee, User
+    belongs_to :payer, User
+  end
+end
