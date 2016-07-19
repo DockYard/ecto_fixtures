@@ -4,10 +4,11 @@ defmodule EctoFixtures.Mixfile do
   def project do
     [app: :ecto_fixtures,
      version: "0.0.2",
-     elixir: "~> 1.2",
+     elixir: "~> 1.3",
      name: "Ecto Fixtures",
      deps: deps,
      package: package,
+     elixirc_paths: elixirc_paths(Mix.env),
      description: description]
   end
 
@@ -17,6 +18,9 @@ defmodule EctoFixtures.Mixfile do
   def application do
     [applications: [:logger, :uuid, :ecto]]
   end
+
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_env), do: ["lib"]
 
   def description do
     """
@@ -42,7 +46,7 @@ defmodule EctoFixtures.Mixfile do
   # Type `mix help deps` for more examples and options
   defp deps do
     [
-      {:ecto, "> 0.0.0"},
+      {:ecto, "~> 2.0.0"},
       {:postgrex, "> 0.0.0", only: :test},
       {:uuid, "~> 1.0"}
     ]

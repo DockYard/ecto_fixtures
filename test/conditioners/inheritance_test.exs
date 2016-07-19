@@ -1,35 +1,75 @@
 defmodule EctoFixtures.Conditioners.InheritanceTest do
   use ExUnit.Case
 
-  test "can inherit from other rows" do
-    source = "test/fixtures/inheritance.exs"
-    data = EctoFixtures.read(source)
-    |> EctoFixtures.parse
-    |> EctoFixtures.condition
+  test "can inherit from other reduced rows" do
+    acc = %{
+      brian: %{
+        model: Owner,
+        repo: Base,
+        path: "foo/bar.fixtures",
+        inherits: :owner_admin,
+        columns: %{
+          name: "Brian",
+          age: 36,
+          pet: :boomer
+        }
+      },
+      owner_admin: %{
+        model: Owner,
+        repo: Base,
+        path: "foo/bar.fixtures",
+        columns: %{
+          id: 1,
+          name: "Default Admin",
+          admin: true
+        }
+      }
+    }
 
-    source = String.to_atom(source)
+    refute Map.has_key?(acc[:brian][:columns], :admin)
+    assert acc[:brian][:columns][:name] == "Brian"
 
-    assert data[source][:owners][:rows][:brian][:data][:admin] == data[source][:owners][:rows][:stephanie][:data][:admin]
-    assert data[source][:owners][:rows][:brian][:data][:viewed_profile] == data[source][:owners][:rows][:stephanie][:data][:viewed_profile]
-    refute data[source][:owners][:rows][:brian][:data][:name] == data[source][:owners][:rows][:stephanie][:data][:name]
-    refute data[source][:owners][:rows][:brian][:data][:id] == data[source][:owners][:rows][:stephanie][:data][:id]
+    acc = EctoFixtures.Conditioners.Inheritance.process(acc, :brian)
 
-    refute data[source][:owners][:rows][:brian][:data][:admin] == data[source][:other_owners][:rows][:thomas][:data][:admin]
-    assert data[source][:owners][:rows][:brian][:data][:viewed_profile] == data[source][:other_owners][:rows][:thomas][:data][:viewed_profile]
-    refute data[source][:owners][:rows][:brian][:data][:name] == data[source][:other_owners][:rows][:thomas][:data][:name]
-    refute data[source][:owners][:rows][:brian][:data][:id] == data[source][:other_owners][:rows][:thomas][:data][:id]
+    assert acc[:brian][:columns][:admin] == true
+    assert acc[:brian][:columns][:name] == "Brian"
+    refute Map.has_key?(acc[:brian][:columns], :id)
   end
 
-  test "can inherit from other fixture files" do
-    source = "test/fixtures/inheritance_fixture.exs"
-    data = EctoFixtures.read(source)
-    |> EctoFixtures.parse
-    |> EctoFixtures.condition
+  test "can inherit from other rows" do
+    acc = %{
+      brian: %{
+        model: Owner,
+        repo: Base,
+        path: "foo/bar.fixtures",
+        inherits: :owner_admin,
+        columns: %{
+          name: "Brian",
+          age: 36,
+          pet: :boomer
+        }
+      },
+      __data__: %{
+        owner_admin: %{
+          model: Owner,
+          repo: Base,
+          path: "foo/bar.fixtures",
+          columns: %{
+            id: 1,
+            name: "Default Admin",
+            admin: true
+          }
+        }
+      }
+    }
 
-    source = String.to_atom(source)
+    refute Map.has_key?(acc[:brian][:columns], :admin)
+    assert acc[:brian][:columns][:name] == "Brian"
 
-    assert data[source][:owners][:rows][:non_admin][:data][:admin] == false
-    assert data[source][:owners][:rows][:non_admin][:data][:name] == "Thomas"
-    assert data[source][:owners][:rows][:non_admin][:data][:viewed_profile] == true
+    acc = EctoFixtures.Conditioners.Inheritance.process(acc, :brian)
+
+    assert acc[:brian][:columns][:admin] == true
+    assert acc[:brian][:columns][:name] == "Brian"
+    refute Map.has_key?(acc[:brian][:columns], :id)
   end
 end

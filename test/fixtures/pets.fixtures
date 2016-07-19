@@ -1,0 +1,6 @@
+@repo BaseRepo
+@model Pet
+
+boomer do
+  name "Boomer"
+end

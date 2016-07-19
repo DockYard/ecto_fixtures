@@ -8,21 +8,22 @@ Code.require_file "./support/migrations.exs", __DIR__
 defmodule EctoFixtures.Integration.Case do
   use ExUnit.CaseTemplate
 
-  setup_all do
-    Ecto.Adapters.SQL.begin_test_transaction(BaseRepo, [])
-    on_exit fn -> Ecto.Adapters.SQL.rollback_test_transaction(BaseRepo, []) end
-    :ok
-  end
+  setup tags do
+    :ok = Ecto.Adapters.SQL.Sandbox.checkout(BaseRepo)
 
-  setup do
-    Ecto.Adapters.SQL.restart_test_transaction(BaseRepo, [])
+    unless tags[:async] do
+      Ecto.Adapters.SQL.Sandbox.mode(BaseRepo, {:shared, self()})
+    end
+
     :ok
   end
 end
 
-_ = Ecto.Storage.down(BaseRepo)
-:ok = Ecto.Storage.up(BaseRepo)
+_   = Ecto.Adapters.Postgres.storage_down(BaseRepo.config)
+:ok = Ecto.Adapters.Postgres.storage_up(BaseRepo.config)
 
 {:ok, _pid} = BaseRepo.start_link
+
 :ok = Ecto.Migrator.up(BaseRepo, 0, EctoFixtures.Migrations, log: false)
+Ecto.Adapters.SQL.Sandbox.mode(BaseRepo, :manual)
 Process.flag(:trap_exit, true)

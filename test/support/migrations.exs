@@ -70,5 +70,9 @@ defmodule EctoFixtures.Migrations do
       add :payee_id, references(:users)
       add :payer_id, references(:users)
     end
+
+    create table(:orders) do
+      add :cost, :integer, default: 0
+    end
   end
 end

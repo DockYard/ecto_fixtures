@@ -158,3 +158,11 @@ defmodule Payment do
     belongs_to :payer, User
   end
 end
+
+defmodule Order do
+  use Ecto.Schema
+
+  schema "orders" do
+    field :cost
+  end
+end

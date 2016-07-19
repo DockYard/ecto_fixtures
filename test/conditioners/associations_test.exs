@@ -1,226 +1,610 @@
 defmodule EctoFixtures.Conditioners.AssociationsTest do
   use ExUnit.Case
+  import EctoFixtures.Dag, only: [create: 0]
 
   test "sets foreign key for has_one association properly and removes association" do
-    source = "test/fixtures/associations/has_one.exs"
-    data = EctoFixtures.read(source)
-    |> EctoFixtures.parse()
+    acc = %{
+      __dag__: create(),
+      __data__: %{},
+      brian: %{
+        model: Owner,
+        repo: Base,
+        path: "foo/bar.fixtures",
+        columns: %{
+          id: 1,
+          name: "Brian",
+          age: 36,
+          pet: :boomer
+        }
+      },
+      boomer: %{
+        model: Pet,
+        repo: Base,
+        path: "foo/bar.fixtures",
+        columns: %{
+          id: 2,
+          name: "Boomer"
+        }
+      }
+    }
 
-    source = String.to_atom(source)
+    assert is_nil(acc[:boomer][:columns][:owner_id])
 
-    assert is_nil(data[source][:pets][:rows][:boomer][:data][:owner_id])
+    acc = EctoFixtures.Conditioners.Associations.process(acc, :brian)
 
-    data = EctoFixtures.condition(data)
+    assert acc[:boomer][:columns][:owner_id] == 1
+    refute Map.has_key?(acc[:brian][:columns], :pet)
+  end
 
-    assert is_integer(data[source][:pets][:rows][:boomer][:data][:owner_id])
-    refute Map.has_key?(data[source][:owners][:rows][:brian][:data], :pet)
+  test "will not go into infinite loop with loaded associations in the accumulator" do
+    acc = %{
+      __dag__: create(),
+      __data__: %{},
+      brian: %{
+        model: Owner,
+        repo: Base,
+        path: "foo/bar.fixtures",
+        columns: %{
+          id: 1,
+          name: "Brian",
+          age: 36,
+          pet: :boomer
+        }
+      },
+      boomer: %{
+        model: Pet,
+        repo: Base,
+        path: "foo/bar.fixtures",
+        columns: %{
+          id: 2,
+          name: "Boomer",
+          owner: :brian
+        }
+      }
+    }
+
+    assert is_nil(acc[:boomer][:columns][:owner_id])
+
+    acc = EctoFixtures.Conditioners.Associations.process(acc, :brian)
+
+    assert acc[:boomer][:columns][:owner_id] == 1
+    refute Map.has_key?(acc[:brian][:columns], :pet)
   end
 
   test "sets foreign key for has_one through association properly and removes association" do
-    source = "test/fixtures/associations/has_one/through.exs"
-    data = EctoFixtures.read(source)
-    |> EctoFixtures.parse
+    acc = %{
+      __dag__: create(),
+      __data__: %{},
+      test_post: %{
+        model: Post,
+        repo: Base,
+        path: "foo/bar.fixtures",
+        columns: %{
+          id: 1,
+          title: "Test Title",
+          tag: :test_tag
+        }
+      },
+      test_tag: %{
+        model: Tag,
+        repo: Base,
+        path: "foo/bar.fixtures",
+        columns: %{
+          id: 2,
+          name: "Test Tag",
+          post: :test_post
+        }
+      }
+    }
 
-    source = String.to_atom(source)
+    through_row_name = :"test_post-1--test_tag-2--post_tag"
 
-    assert is_nil(data[source][:post_tags])
-    assert Map.has_key?(data[source][:posts][:rows][:foo][:data], :tag)
+    refute Map.has_key?(acc, through_row_name)
+    refute Map.has_key?(acc, :"test_tag-2--test_post-1--post_tag")
+    assert Map.has_key?(acc[:test_post][:columns], :tag)
 
-    data = EctoFixtures.condition(data)
+    acc =
+      EctoFixtures.Conditioners.Associations.process(acc, :test_post)
+      |> EctoFixtures.Conditioners.Associations.process(:test_tag)
 
-    path = [source, :posts, :rows, :foo]
-    inverse_path = [source, :tags, :rows, :bar]
-
-    through_row_name =
-      (Enum.join(path, "-") <> ":" <> Enum.join(inverse_path, "-"))
-      |> String.to_atom()
-
-    assert is_integer(data[source][:post_tags][:rows][through_row_name][:data][:post_id])
-    assert is_integer(data[source][:post_tags][:rows][through_row_name][:data][:tag_id])
-    refute Map.has_key?(data[source][:posts][:rows][:foo][:data], :tag)
+    assert acc[through_row_name][:columns][:post_id] == 1
+    assert acc[through_row_name][:columns][:tag_id] == 2
+    refute Map.has_key?(acc, :"test_tag-2--test_post-1--post_tag")
+    refute is_nil(acc[through_row_name][:columns][:id])
+    refute Map.has_key?(acc[:test_post][:columns], :tag)
   end
 
-  test "imports data from inverse fixture file for has_one association that references inverse file" do
-    source = "test/fixtures/associations/has_one/import.exs"
-    inverse_source = "test/fixtures/associations/has_one/import_dep.exs"
-    data = EctoFixtures.read(source)
-    |> EctoFixtures.parse
+  test "loads has_one association not found in the accumulator from the data object" do
+    data = %{
+      boomer: %{
+        model: Pet,
+        repo: Base,
+        path: "foo/bar.fixtures",
+        columns: %{
+          id: 2,
+          name: "Boomer"
+        }
+      }
+    }
 
-    source = String.to_atom(source)
-    inverse_source = String.to_atom(inverse_source)
+    acc = %{
+      __dag__: create(),
+      __data__: data,
+      brian: %{
+        model: Owner,
+        repo: Base,
+        path: "foo/bar.fixtures",
+        columns: %{
+          id: 1,
+          name: "Brian",
+          age: 36,
+          pet: :boomer
+        }
+      },
+    }
 
-    data = EctoFixtures.condition(data)
+    assert is_nil(acc[:boomer][:columns][:owner_id])
 
-    assert is_integer(data[inverse_source][:pets][:rows][:boomer][:data][:owner_id])
-    refute Map.has_key?(data[source][:owners][:rows][:brian][:data], :pet)
+    acc = EctoFixtures.Conditioners.Associations.process(acc, :brian)
 
-    assert data[inverse_source][:pets][:model] == Pet
-    assert data[inverse_source][:pets][:repo] == Base
+    assert acc[:boomer][:columns][:owner_id] == 1
+    refute Map.has_key?(acc[:brian][:columns], :pet)
   end
 
-  test "imports data from inverse fixture file for has_one through association that references inverse file" do
-    source = "test/fixtures/associations/has_one/through/import.exs"
-    inverse_source = "test/fixtures/associations/has_one/through/import_dep.exs"
-    data = EctoFixtures.read(source)
-    |> EctoFixtures.parse
+  test "does not go into infinite loop when loading association not found in the accumulator from the data object" do
+    data = %{
+      boomer: %{
+        model: Pet,
+        repo: Base,
+        path: "foo/bar.fixtures",
+        columns: %{
+          id: 2,
+          name: "Boomer",
+          owner: :brian
+        }
+      }
+    }
 
+    acc = %{
+      __dag__: create(),
+      __data__: data,
+      brian: %{
+        model: Owner,
+        repo: Base,
+        path: "foo/bar.fixtures",
+        columns: %{
+          id: 1,
+          name: "Brian",
+          age: 36,
+          pet: :boomer
+        }
+      },
+    }
 
-    source = String.to_atom(source)
-    inverse_source = String.to_atom(inverse_source)
+    assert is_nil(acc[:boomer][:columns][:owner_id])
 
-    assert is_nil(data[source][:post_tags])
-    assert Map.has_key?(data[source][:posts][:rows][:foo][:data], :tag)
+    acc = EctoFixtures.Conditioners.Associations.process(acc, :brian)
 
-    data = EctoFixtures.condition(data)
+    assert acc[:boomer][:columns][:owner_id] == 1
+    refute Map.has_key?(acc[:brian][:columns], :pet)
+  end
 
-    path = [source, :posts, :rows, :foo]
-    inverse_path = [inverse_source, :tags, :rows, :bar]
+  test "loads has_one through association not found in the accumulator from the data object" do
+    data = %{
+      test_tag: %{
+        model: Tag,
+        repo: Base,
+        path: "foo/bar.fixtures",
+        columns: %{
+          id: 1,
+          name: "Test Tag",
+          post: :test_post
+        }
+      }
+    }
 
-    through_row_name =
-      (Enum.join(path, "-") <> ":" <> Enum.join(inverse_path, "-"))
-      |> String.to_atom()
+    acc = %{
+      __dag__: create(),
+      __data__: data,
+      test_post: %{
+        model: Post,
+        repo: Base,
+        path: "foo/bar.fixtures",
+        columns: %{
+          id: 1,
+          title: "Test Title",
+          tag: :test_tag
+        }
+      }
+    }
 
-    assert is_integer(data[source][:post_tags][:rows][through_row_name][:data][:post_id])
-    assert is_integer(data[source][:post_tags][:rows][through_row_name][:data][:tag_id])
-    refute Map.has_key?(data[source][:posts][:rows][:foo][:data], :tag)
+    through_row_name = :"test_post-1--test_tag-1--post_tag"
 
-    assert data[inverse_source][:tags][:model] == Tag
-    assert data[inverse_source][:tags][:repo] == BaseRepo
+    refute Map.has_key?(acc, through_row_name)
+    refute Map.has_key?(acc, :"test_tag-1--test_post-1--post_tag")
+    assert Map.has_key?(acc[:test_post][:columns], :tag)
+    refute acc[:test_tag]
+
+    acc =
+      EctoFixtures.Conditioners.Associations.process(acc, :test_post)
+      |> EctoFixtures.Conditioners.Associations.process(:test_tag)
+
+    assert acc[through_row_name][:columns][:post_id] == 1
+    assert acc[through_row_name][:columns][:tag_id] == 1
+    refute Map.has_key?(acc, :"test_tag-1--test_post-1--post_tag")
+    refute Map.has_key?(acc[:test_post][:columns], :tag)
+    assert acc[:test_tag]
   end
 
   test "sets foreign key for belongs_to association properly and removes association" do
-    source = "test/fixtures/associations/belongs_to.exs"
-    data = EctoFixtures.read(source)
-    |> EctoFixtures.parse
+    acc = %{
+      __dag__: create(),
+      __data__: %{},
+      brian: %{
+        model: Owner,
+        repo: Base,
+        path: "foo/bar.fixtures",
+        columns: %{
+          id: 1,
+          name: "Brian",
+          age: 36,
+        }
+      },
+      boomer: %{
+        model: Pet,
+        repo: Base,
+        path: "foo/bar.fixtures",
+        columns: %{
+          id: 2,
+          name: "Boomer",
+          owner: :brian
+        }
+      }
+    }
 
-    source = String.to_atom(source)
+    assert is_nil(acc[:boomer][:columns][:owner_id])
 
-    assert is_nil(data[source][:pets][:rows][:boomer][:data][:owner_id])
+    acc = EctoFixtures.Conditioners.Associations.process(acc, :boomer)
 
-    data = EctoFixtures.condition(data)
-
-    assert is_integer(data[source][:pets][:rows][:boomer][:data][:owner_id])
-    refute Map.has_key?(data[source][:pets][:rows][:boomer][:data], :owner)
+    assert acc[:boomer][:columns][:owner_id] == 1
+    refute Map.has_key?(acc[:brian][:columns], :pet)
   end
 
-  test "imports data from inverse fixture file for belongs_to association that references inverse file" do
-    source = "test/fixtures/associations/belongs_to/import.exs"
-    inverse_source = "test/fixtures/associations/belongs_to/import_dep.exs"
-    data = EctoFixtures.read(source)
-    |> EctoFixtures.parse
+  test "loads belongs_to association not found in the accumulator from the data object" do
+    data = %{
+      brian: %{
+        model: Owner,
+        repo: Base,
+        path: "foo/bar.fixtures",
+        columns: %{
+          id: 1,
+          name: "Brian",
+          age: 36,
+        }
+      }
+    }
 
-    source = String.to_atom(source)
-    inverse_source = String.to_atom(inverse_source)
+    acc = %{
+      __dag__: create(),
+      __data__: data,
+      boomer: %{
+        model: Pet,
+        repo: Base,
+        path: "foo/bar.fixtures",
+        columns: %{
+          id: 2,
+          name: "Boomer",
+          owner: :brian
+        }
+      }
+    }
 
-    assert is_nil(data[source][:pets][:rows][:boomer][:data][:owner_id])
+    assert is_nil(acc[:boomer][:columns][:owner_id])
 
-    data = EctoFixtures.condition(data)
+    acc = EctoFixtures.Conditioners.Associations.process(acc, :boomer)
 
-    assert is_integer(data[source][:pets][:rows][:boomer][:data][:owner_id])
-    refute Map.has_key?(data[source][:pets][:rows][:boomer][:data], :owner)
-    assert data[inverse_source][:owners][:rows][:brian][:data][:name] == "Brian"
-
-    assert data[inverse_source][:owners][:model] == Owner
-    assert data[inverse_source][:owners][:repo] == Base
+    assert acc[:boomer][:columns][:owner_id] == 1
+    refute Map.has_key?(acc[:brian][:columns], :pet)
   end
 
   test "sets foreign key for has_many association properly and removes association" do
-    source = "test/fixtures/associations/has_many.exs"
-    data = EctoFixtures.read(source)
-    |> EctoFixtures.parse
+    acc = %{
+      __dag__: create(),
+      __data__: %{},
+      brian: %{
+        model: Owner,
+        repo: Base,
+        path: "foo/bar.fixtures",
+        columns: %{
+          id: 1,
+          name: "Brian",
+          age: 36,
+          cars: [:nissan, :tesla]
+        }
+      },
+      nissan: %{
+        model: Car,
+        repo: Base,
+        path: "foo/bar.fixtures",
+        columns: %{
+          id: 1,
+          color: "black"
+        }
+      },
+      tesla: %{
+        model: Car,
+        repo: Base,
+        path: "foo/bar.fixtures",
+        columns: %{
+          id: 2,
+          color: "red"
+        }
+      }
+    }
 
-    source = String.to_atom(source)
+    assert is_nil(acc[:nissan][:columns][:owner_id])
+    assert is_nil(acc[:tesla][:columns][:owner_id])
+    refute is_nil(acc[:brian][:columns][:cars])
 
-    assert is_nil(data[source][:cars][:rows][:nissan][:data][:owner_id])
-    assert is_nil(data[source][:cars][:rows][:tesla][:data][:owner_id])
-    refute is_nil(data[source][:owners][:rows][:brian][:data][:cars])
+    acc = EctoFixtures.Conditioners.Associations.process(acc, :brian)
 
-    data = EctoFixtures.condition(data)
+    assert acc[:nissan][:columns][:owner_id] == 1
+    assert acc[:tesla][:columns][:owner_id] == 1
+    refute Map.has_key?(acc[:brian][:columns], :cars)
+  end
 
-    assert is_integer(data[source][:cars][:rows][:nissan][:data][:owner_id])
-    assert is_integer(data[source][:cars][:rows][:tesla][:data][:owner_id])
-    refute Map.has_key?(data[source][:owners][:rows][:brian][:data], :cars)
+  test "loads has_many association not found in the accumulator from the data object" do
+    data = %{
+      nissan: %{
+        model: Car,
+        repo: Base,
+        path: "foo/bar.fixtures",
+        columns: %{
+          id: 1,
+          color: "black"
+        }
+      },
+      tesla: %{
+        model: Car,
+        repo: Base,
+        path: "foo/bar.fixtures",
+        columns: %{
+          id: 2,
+          color: "red"
+        }
+      }
+    }
+
+    acc = %{
+      __dag__: create(),
+      __data__: data,
+      brian: %{
+        model: Owner,
+        repo: Base,
+        path: "foo/bar.fixtures",
+        columns: %{
+          id: 1,
+          name: "Brian",
+          age: 36,
+          cars: [:nissan, :tesla]
+        }
+      },
+    }
+
+    refute Map.has_key?(acc, :nissan)
+    refute Map.has_key?(acc, :tesla)
+    refute is_nil(acc[:brian][:columns][:cars])
+
+    acc = EctoFixtures.Conditioners.Associations.process(acc, :brian)
+
+    assert acc[:nissan][:columns][:owner_id] == 1
+    assert acc[:tesla][:columns][:owner_id] == 1
+    refute Map.has_key?(acc[:brian][:columns], :cars)
   end
 
   test "sets foreign key for has_many through association properly and removes association" do
-    source = "test/fixtures/associations/has_many/through.exs"
-    data = EctoFixtures.read(source)
-    |> EctoFixtures.parse
+    acc = %{
+      __dag__: create(),
+      __data__: %{},
+      test_post: %{
+        model: Post,
+        repo: Base,
+        path: "foo/bar.fixtures",
+        columns: %{
+          id: 1,
+          title: "Test Title",
+          tags: [:test_tag_1, :test_tag_2]
+        }
+      },
+      test_tag_1: %{
+        model: Tag,
+        repo: Base,
+        path: "foo/bar.fixtures",
+        columns: %{
+          id: 1,
+          name: "Test Tag 1",
+          posts: [:test_post]
+        }
+      },
+      test_tag_2: %{
+        model: Tag,
+        repo: Base,
+        path: "foo/bar.fixtures",
+        columns: %{
+          id: 2,
+          name: "Test Tag 2",
+          posts: [:test_post]
+        }
+      }
+    }
 
-    source = String.to_atom(source)
+    through_row_name_1 = :"test_post-1--test_tag_1-1--posts_tags"
+    through_row_name_2 = :"test_post-1--test_tag_2-2--posts_tags"
 
-    assert is_nil(data[source][:post_tags])
-    assert Map.has_key?(data[source][:posts][:rows][:foo][:data], :tags)
+    refute Map.has_key?(acc, through_row_name_1)
+    refute Map.has_key?(acc, through_row_name_2)
+    refute Map.has_key?(acc, :"test_tag_1-1--test_post-1--posts_tags")
+    refute Map.has_key?(acc, :"test_tag_2-2--test_post-1--posts_tags")
+    assert Map.has_key?(acc[:test_post][:columns], :tags)
 
-    data = EctoFixtures.condition(data)
+    acc =
+      acc
+      |> EctoFixtures.Conditioners.Associations.process(:test_post)
+      |> EctoFixtures.Conditioners.Associations.process(:test_tag_1)
+      |> EctoFixtures.Conditioners.Associations.process(:test_tag_2)
 
-    path = [source, :posts, :rows, :foo]
-    inverse_path = [source, :tags, :rows]
+    assert acc[through_row_name_1][:columns][:post_id] == 1
+    assert acc[through_row_name_1][:columns][:tag_id] == 1
 
-    through_row_name = fn(name) ->
-      (Enum.join(path, "-") <> ":" <> Enum.join(inverse_path ++ [name], "-"))
-      |> String.to_atom()
-    end
+    assert acc[through_row_name_2][:columns][:post_id] == 1
+    assert acc[through_row_name_2][:columns][:tag_id] == 2
 
-    assert is_integer(data[source][:posts_tags][:rows][through_row_name.(:bar)][:data][:post_id])
-    assert is_integer(data[source][:posts_tags][:rows][through_row_name.(:bar)][:data][:tag_id])
+    refute Map.has_key?(acc, :"test_tag_1-1--test_post-1--posts_tags")
+    refute Map.has_key?(acc, :"test_tag_2-2--test_post-1--posts_tags")
 
-    assert is_integer(data[source][:posts_tags][:rows][through_row_name.(:baz)][:data][:post_id])
-    assert is_integer(data[source][:posts_tags][:rows][through_row_name.(:baz)][:data][:tag_id])
-
-    refute Map.has_key?(data[source][:posts][:rows][:foo][:data], :tag)
+    refute Map.has_key?(acc[:test_post][:columns], :tags)
   end
 
-  test "imports data from inverse fixture file for has_many association that references inverse file" do
-    source = "test/fixtures/associations/has_many/import.exs"
-    inverse_source = "test/fixtures/associations/has_many/import_dep.exs"
-    data = EctoFixtures.read(source)
-    |> EctoFixtures.parse
+  test "loads has_many through association not found in the accumulator from the data object" do
+    data = %{
+      test_tag_1: %{
+        model: Tag,
+        repo: Base,
+        path: "foo/bar.fixtures",
+        columns: %{
+          id: 1,
+          name: "Test Tag 1",
+          posts: [:test_post]
+        }
+      },
+      test_tag_2: %{
+        model: Tag,
+        repo: Base,
+        path: "foo/bar.fixtures",
+        columns: %{
+          id: 2,
+          name: "Test Tag 2",
+          posts: [:test_post]
+        }
+      }
+    }
 
-    source = String.to_atom(source)
-    inverse_source = String.to_atom(inverse_source)
+    acc = %{
+      __dag__: create(),
+      __data__: data,
+      test_post: %{
+        model: Post,
+        repo: Base,
+        path: "foo/bar.fixtures",
+        columns: %{
+          id: 1,
+          title: "Test Title",
+          tags: [:test_tag_1, :test_tag_2]
+        }
+      }
+    }
 
-    assert is_nil(data[inverse_source][:cars][:rows][:nissan][:data][:owner_id])
-    assert is_nil(data[inverse_source][:cars][:rows][:tesla][:data][:owner_id])
-    refute is_nil(data[source][:owners][:rows][:brian][:data][:cars])
+    through_row_name_1 = :"test_post-1--test_tag_1-1--posts_tags"
+    through_row_name_2 = :"test_post-1--test_tag_2-2--posts_tags"
 
-    data = EctoFixtures.condition(data)
+    refute Map.has_key?(acc, through_row_name_1)
+    refute Map.has_key?(acc, through_row_name_2)
+    refute Map.has_key?(acc, :"test_tag_1-1--test_post-1--posts_tags")
+    refute Map.has_key?(acc, :"test_tag_2-2--test_post-1--posts_tags")
+    assert Map.has_key?(acc[:test_post][:columns], :tags)
 
-    assert is_integer(data[inverse_source][:cars][:rows][:nissan][:data][:owner_id])
-    assert is_integer(data[inverse_source][:cars][:rows][:tesla][:data][:owner_id])
-    refute Map.has_key?(data[source][:owners][:rows][:brian][:data], :cars)
+    acc =
+      acc
+      |> EctoFixtures.Conditioners.Associations.process(:test_post)
+      |> EctoFixtures.Conditioners.Associations.process(:test_tag_1)
+      |> EctoFixtures.Conditioners.Associations.process(:test_tag_2)
 
-    assert data[inverse_source][:cars][:model] == Car
-    assert data[inverse_source][:cars][:repo] == Base
+    assert acc[through_row_name_1][:columns][:post_id] == 1
+    assert acc[through_row_name_1][:columns][:tag_id] == 1
+    refute is_nil(acc[through_row_name_1][:columns][:id])
+
+    assert acc[through_row_name_2][:columns][:post_id] == 1
+    assert acc[through_row_name_2][:columns][:tag_id] == 2
+    refute is_nil(acc[through_row_name_2][:columns][:id])
+
+    refute Map.has_key?(acc, :"test_tag_1-1--test_post-1--posts_tags")
+    refute Map.has_key?(acc, :"test_tag_2-2--test_post-1--posts_tags")
+
+    refute Map.has_key?(acc[:test_post][:columns], :tags)
   end
 
-  test "imports data from inverse fixture file for has_many through association that references inverse file" do
-    source = "test/fixtures/associations/has_many/through/import.exs"
-    inverse_source = "test/fixtures/associations/has_many/through/import_dep.exs"
-    data = EctoFixtures.read(source)
-    |> EctoFixtures.parse
+  test "dag ordering continues for deeply nested assocations" do
+    data = %{
+      invoice_1: %{
+        model: Invoice,
+        repo: Base,
+        path: "foo/bar.fixtures",
+        columns: %{
+          property: :property_1,
+          owner: :owner_1,
+          renter: :renter_1
+        }
+      },
+      property_1: %{
+        model: Property,
+        repo: Base,
+        path: "foo/bar.fixtures",
+        columns: %{
+          owner: :owner_1,
+          renter: :renter_1
+        }
+      },
+      property_2: %{
+        model: Property,
+        repo: Base,
+        path: "foo/bar.fixtures",
+        columns: %{
+          owner: :owner_2,
+          render: :renter_2
+        }
+      },
+      owner_1: %{
+        model: User,
+        repo: Base,
+        path: "foo/bar.fixtures",
+        columns: %{ }
+      },
+      owner_2: %{
+        model: User,
+        repo: Base,
+        path: "foo/bar.fixtures",
+        columns: %{ }
+      },
+      renter_1: %{
+        model: User,
+        repo: Base,
+        path: "foo/bar.fixtures",
+        columns: %{ }
+      },
+      renter_2: %{
+        model: User,
+        repo: Base,
+        path: "foo/bar.fixtures",
+        columns: %{ }
+      }
+    }
 
-    source = String.to_atom(source)
+    acc =
+      %{__dag__: EctoFixtures.Dag.create(), __data__: data}
+      |> EctoFixtures.Reducer.process([[:invoice_1]])
 
-    assert is_nil(data[source][:post_tags])
-    assert Map.has_key?(data[source][:posts][:rows][:foo][:data], :tags)
+    dag = acc[:__dag__]
 
-    data = EctoFixtures.condition(data)
+    invoice_vtx = :invoice_1
+    owner_vtx = :owner_1
+    renter_vtx = :renter_1
+    property_vtx = :property_1
 
-    path = [source, :posts, :rows, :foo]
-    inverse_path = [inverse_source, :tags, :rows]
+    assert :digraph.get_path(dag, owner_vtx, invoice_vtx) == [owner_vtx, invoice_vtx]
+    assert :digraph.get_path(dag, renter_vtx, invoice_vtx) == [renter_vtx, invoice_vtx]
+    assert :digraph.get_path(dag, property_vtx, invoice_vtx) == [property_vtx, invoice_vtx]
 
-    through_row_name = fn(name) ->
-      (Enum.join(path, "-") <> ":" <> Enum.join(inverse_path ++ [name], "-"))
-      |> String.to_atom()
-    end
-
-    assert is_integer(data[source][:posts_tags][:rows][through_row_name.(:bar)][:data][:post_id])
-    assert is_integer(data[source][:posts_tags][:rows][through_row_name.(:bar)][:data][:tag_id])
-
-    assert is_integer(data[source][:posts_tags][:rows][through_row_name.(:baz)][:data][:post_id])
-    assert is_integer(data[source][:posts_tags][:rows][through_row_name.(:baz)][:data][:tag_id])
-
-    refute Map.has_key?(data[source][:posts][:rows][:foo][:data], :tag)
+    assert :digraph.get_path(dag, owner_vtx, property_vtx) == [owner_vtx, property_vtx]
+    assert :digraph.get_path(dag, renter_vtx, property_vtx) == [renter_vtx, property_vtx]
   end
 end

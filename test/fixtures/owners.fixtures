@@ -1,0 +1,13 @@
+@repo BaseRepo
+@model Owner
+@group :owners
+
+brian do
+  name "Brian"
+  age 36
+end
+
+stephanie do
+  name "Stephanie"
+  age 35
+end

@@ -1,0 +1,7 @@
+@repo BaseRepo
+@model Car
+@group :cars
+
+nissan do
+  color "black"
+end
