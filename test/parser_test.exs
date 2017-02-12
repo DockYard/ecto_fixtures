@@ -20,7 +20,11 @@ defmodule EctoFixtures.ParserTest do
       owners: %{
         model: Owner,
         repo: Base,
-        rows: %{brian: %{data: %{name: "Brian", age: 35}}}
+        rows: %{
+          brian: %{
+            data: %{name: "Brian", age: 35, joined_on: %Ecto.Date{year: 1990, month: 5, day: 4}}
+          }
+        }
       }
     }}
   end
