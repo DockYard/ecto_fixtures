@@ -5,7 +5,10 @@ defmodule EctoFixtures.Serializer do
 
     Enum.reduce(row_names, acc, fn(row_name, acc) ->
       row = acc[row_name]
-      serializers = Map.get(data[row_name], :serializers, [])
+      serializers = case get_in(data, [row_name, :serializers]) do
+        nil -> []
+        serializers -> serializers
+      end
       serializer = case Keyword.fetch(serializers, context) do
         :error -> Keyword.get(serializers, :default)
         {:ok, serializer} -> serializer
