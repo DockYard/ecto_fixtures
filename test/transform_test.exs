@@ -1,13 +1,13 @@
 defmodule EctoFixtures.Conditioners.TransformTest do
   defmodule Fixtures do
-    def fixture_data() do
+    def data() do
       %{
         brian: %{
-          model: Owner,
-          repo: BaseRepo,
+          schema: Owner,
+          repos: [default: BaseRepo],
           group: :owners,
-          path: "foo/bar.fixtures",
-          serializer: Serializer,
+          mod: FooBar,
+          serializers: [default: Serializer],
           columns: %{
             name: "Brian",
             age: 36,
@@ -15,28 +15,28 @@ defmodule EctoFixtures.Conditioners.TransformTest do
           }
         },
         stephanie: %{
-          model: Owner,
-          repo: BaseRepo,
+          schema: Owner,
+          repos: [default: BaseRepo],
           group: :owners,
-          path: "foo/bar.fixtures",
+          mod: FooBar,
           columns: %{
             name: "Stephanie",
             age: 35
           }
         },
         boomer: %{
-          model: Pet,
-          repo: BaseRepo,
-          path: "foo/bar.fixtures",
-          serializer: Serializer,
+          schema: Pet,
+          repos: [default: BaseRepo],
+          mod: FooBar,
+          serializers: [default: Serializer],
           columns: %{
             name: "Boomer"
           }
         },
         nissan: %{
-          model: Car,
-          repo: BaseRepo,
-          path: "foo/bar.fixtures",
+          schema: Car,
+          repos: [default: BaseRepo],
+          mod: FooBar,
           group: :cars,
           columns: %{
             color: "black"

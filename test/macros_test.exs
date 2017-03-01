@@ -1,13 +1,12 @@
-defmodule EctoFixtures.ModuleAttributesTest do
+defmodule EctoFixtures.MacrosTest do
   defmodule Fixtures do
-    def fixture_data() do
+    def data() do
       %{
         brian: %{
-          model: Owner,
-          repo: BaseRepo,
-          group: :owners,
-          path: "foo/bar.fixtures",
-          serializer: Serializer,
+          schema: Owner,
+          repos: [default: BaseRepo],
+          mod: FooBar,
+          serializers: [default: Serializer],
           columns: %{
             name: "Brian",
             age: 36,
@@ -15,29 +14,27 @@ defmodule EctoFixtures.ModuleAttributesTest do
           }
         },
         stephanie: %{
-          model: Owner,
-          repo: BaseRepo,
-          group: :owners,
-          path: "foo/bar.fixtures",
+          schema: Owner,
+          repos: [default: BaseRepo],
+          mod: FooBar,
           columns: %{
             name: "Stephanie",
             age: 35
           }
         },
         boomer: %{
-          model: Pet,
-          repo: BaseRepo,
-          path: "foo/bar.fixtures",
-          serializer: Serializer,
+          schema: Pet,
+          repos: [default: BaseRepo],
+          mod: FooBar,
+          serializers: [default: Serializer],
           columns: %{
             name: "Boomer"
           }
         },
         nissan: %{
-          model: Car,
-          repo: BaseRepo,
-          path: "foo/bar.fixtures",
-          group: :cars,
+          schema: Car,
+          repos: [default: BaseRepo],
+          mod: FooBar,
           columns: %{
             color: "black"
           }

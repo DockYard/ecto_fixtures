@@ -4,9 +4,9 @@ defmodule EctoFixtures.Conditioners.PrimaryKeyTest do
   test "generates primary key value if not present for each row" do
     acc = %{
       owner: %{
-        model: Owner,
-        repo: Base,
-        path: "foo/bar.fixtures",
+        schema: Owner,
+        repos: [default: BaseRepo],
+        mod: FooBar,
         columns: %{
           name: "Brian",
           age: 36
@@ -24,9 +24,9 @@ defmodule EctoFixtures.Conditioners.PrimaryKeyTest do
   test "supports overriden primary keys" do
     acc = %{
       pet: %{
-        model: Pet,
-        repo: Base,
-        path: "foo/bar.fixtures",
+        schema: Pet,
+        repos: [default: BaseRepo],
+        mod: FooBar,
         columns: %{
           name: "Boomer"
         }
@@ -43,9 +43,9 @@ defmodule EctoFixtures.Conditioners.PrimaryKeyTest do
   test "supports uuid for primary key" do
     acc = %{
       car: %{
-        model: Car,
-        repo: Base,
-        path: "foo/bar.fixtures",
+        schema: Car,
+        repos: [default: BaseRepo],
+        mod: FooBar,
         columns: %{
           color: "black"
         }
@@ -62,9 +62,9 @@ defmodule EctoFixtures.Conditioners.PrimaryKeyTest do
   test "supports no primary key" do
     acc = %{
       book: %{
-        model: Book,
-        repo: Base,
-        path: "foo/bar.fixtures",
+        schema: Book,
+        repos: [default: BaseRepo],
+        mod: FooBar,
         columns: %{
           title: "Go Dog Go!"
         }
@@ -81,9 +81,9 @@ defmodule EctoFixtures.Conditioners.PrimaryKeyTest do
   test "don't generate id if one already exists" do
     acc = %{
       owner: %{
-        model: Owner,
-        repo: Base,
-        path: "foo/bar.fixtures",
+        schema: Owner,
+        repos: [default: BaseRepo],
+        mod: FooBar,
         columns: %{
           id: 123,
           name: "Brian",

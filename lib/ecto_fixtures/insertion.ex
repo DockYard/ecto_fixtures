@@ -1,22 +1,24 @@
 defmodule EctoFixtures.Insertion do
-  def process(acc, opts) do
+  def process(acc, opts, context \\ :default) do
     sorted_row_names = :digraph_utils.topsort(get_in(acc, [:__dag__]))
 
     Enum.reduce(sorted_row_names, %{}, fn(row_name, records) ->
-      case insert_row(acc[row_name], insert?(row_name, opts)) do
+      case insert_row(acc[row_name], insert?(row_name, opts), context) do
         nil -> records
         record -> Map.put(records, row_name, record)
       end
     end)
   end
 
-  defp insert_row(%{virtual: true}, _insert?), do: nil
-  defp insert_row(%{columns: columns, model: model}, false) do
-    struct(model, columns)
+  defp insert_row(%{virtual: true}, _insert?, _context), do: nil
+  defp insert_row(%{columns: columns, schema: schema}, false, _context) do
+    struct(schema, columns)
   end
-  defp insert_row(record, false), do: record
-  defp insert_row(%{repo: repo} = row, true) do
-    insert_row(row, false)
+  defp insert_row(record, false, _context), do: record
+  defp insert_row(%{repos: repos} = row, true, context) do
+    repo = Keyword.get(repos, context)
+
+    insert_row(row, false, context)
     |> repo.insert!()
   end
 

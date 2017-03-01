@@ -7,9 +7,9 @@ defmodule EctoFixtures.Conditioners.AssociationsTest do
       __dag__: create(),
       __data__: %{},
       brian: %{
-        model: Owner,
-        repo: Base,
-        path: "foo/bar.fixtures",
+        schema: Owner,
+        repos: [default: BaseRepo],
+        mod: FooBar,
         columns: %{
           id: 1,
           name: "Brian",
@@ -18,9 +18,9 @@ defmodule EctoFixtures.Conditioners.AssociationsTest do
         }
       },
       boomer: %{
-        model: Pet,
-        repo: Base,
-        path: "foo/bar.fixtures",
+        schema: Pet,
+        repos: [default: BaseRepo],
+        mod: FooBar,
         columns: %{
           id: 2,
           name: "Boomer"
@@ -41,9 +41,9 @@ defmodule EctoFixtures.Conditioners.AssociationsTest do
       __dag__: create(),
       __data__: %{},
       brian: %{
-        model: Owner,
-        repo: Base,
-        path: "foo/bar.fixtures",
+        schema: Owner,
+        repos: [default: BaseRepo],
+        mod: FooBar,
         columns: %{
           id: 1,
           name: "Brian",
@@ -52,9 +52,9 @@ defmodule EctoFixtures.Conditioners.AssociationsTest do
         }
       },
       boomer: %{
-        model: Pet,
-        repo: Base,
-        path: "foo/bar.fixtures",
+        schema: Pet,
+        repos: [default: BaseRepo],
+        mod: FooBar,
         columns: %{
           id: 2,
           name: "Boomer",
@@ -76,9 +76,9 @@ defmodule EctoFixtures.Conditioners.AssociationsTest do
       __dag__: create(),
       __data__: %{},
       test_post: %{
-        model: Post,
-        repo: Base,
-        path: "foo/bar.fixtures",
+        schema: Post,
+        repos: [default: BaseRepo],
+        mod: FooBar,
         columns: %{
           id: 1,
           title: "Test Title",
@@ -86,9 +86,9 @@ defmodule EctoFixtures.Conditioners.AssociationsTest do
         }
       },
       test_tag: %{
-        model: Tag,
-        repo: Base,
-        path: "foo/bar.fixtures",
+        schema: Tag,
+        repos: [default: BaseRepo],
+        mod: FooBar,
         columns: %{
           id: 2,
           name: "Test Tag",
@@ -117,9 +117,9 @@ defmodule EctoFixtures.Conditioners.AssociationsTest do
   test "loads has_one association not found in the accumulator from the data object" do
     data = %{
       boomer: %{
-        model: Pet,
-        repo: Base,
-        path: "foo/bar.fixtures",
+        schema: Pet,
+        repos: [default: BaseRepo],
+        mod: FooBar,
         columns: %{
           id: 2,
           name: "Boomer"
@@ -131,9 +131,9 @@ defmodule EctoFixtures.Conditioners.AssociationsTest do
       __dag__: create(),
       __data__: data,
       brian: %{
-        model: Owner,
-        repo: Base,
-        path: "foo/bar.fixtures",
+        schema: Owner,
+        repos: [default: BaseRepo],
+        mod: FooBar,
         columns: %{
           id: 1,
           name: "Brian",
@@ -154,9 +154,9 @@ defmodule EctoFixtures.Conditioners.AssociationsTest do
   test "does not go into infinite loop when loading association not found in the accumulator from the data object" do
     data = %{
       boomer: %{
-        model: Pet,
-        repo: Base,
-        path: "foo/bar.fixtures",
+        schema: Pet,
+        repos: [default: BaseRepo],
+        mod: FooBar,
         columns: %{
           id: 2,
           name: "Boomer",
@@ -169,9 +169,9 @@ defmodule EctoFixtures.Conditioners.AssociationsTest do
       __dag__: create(),
       __data__: data,
       brian: %{
-        model: Owner,
-        repo: Base,
-        path: "foo/bar.fixtures",
+        schema: Owner,
+        repos: [default: BaseRepo],
+        mod: FooBar,
         columns: %{
           id: 1,
           name: "Brian",
@@ -192,9 +192,9 @@ defmodule EctoFixtures.Conditioners.AssociationsTest do
   test "loads has_one through association not found in the accumulator from the data object" do
     data = %{
       test_tag: %{
-        model: Tag,
-        repo: Base,
-        path: "foo/bar.fixtures",
+        schema: Tag,
+        repos: [default: BaseRepo],
+        mod: FooBar,
         columns: %{
           id: 1,
           name: "Test Tag",
@@ -207,9 +207,9 @@ defmodule EctoFixtures.Conditioners.AssociationsTest do
       __dag__: create(),
       __data__: data,
       test_post: %{
-        model: Post,
-        repo: Base,
-        path: "foo/bar.fixtures",
+        schema: Post,
+        repos: [default: BaseRepo],
+        mod: FooBar,
         columns: %{
           id: 1,
           title: "Test Title",
@@ -241,9 +241,9 @@ defmodule EctoFixtures.Conditioners.AssociationsTest do
       __dag__: create(),
       __data__: %{},
       brian: %{
-        model: Owner,
-        repo: Base,
-        path: "foo/bar.fixtures",
+        schema: Owner,
+        repos: [default: BaseRepo],
+        mod: FooBar,
         columns: %{
           id: 1,
           name: "Brian",
@@ -251,9 +251,9 @@ defmodule EctoFixtures.Conditioners.AssociationsTest do
         }
       },
       boomer: %{
-        model: Pet,
-        repo: Base,
-        path: "foo/bar.fixtures",
+        schema: Pet,
+        repos: [default: BaseRepo],
+        mod: FooBar,
         columns: %{
           id: 2,
           name: "Boomer",
@@ -273,9 +273,9 @@ defmodule EctoFixtures.Conditioners.AssociationsTest do
   test "loads belongs_to association not found in the accumulator from the data object" do
     data = %{
       brian: %{
-        model: Owner,
-        repo: Base,
-        path: "foo/bar.fixtures",
+        schema: Owner,
+        repos: [default: BaseRepo],
+        mod: FooBar,
         columns: %{
           id: 1,
           name: "Brian",
@@ -288,9 +288,9 @@ defmodule EctoFixtures.Conditioners.AssociationsTest do
       __dag__: create(),
       __data__: data,
       boomer: %{
-        model: Pet,
-        repo: Base,
-        path: "foo/bar.fixtures",
+        schema: Pet,
+        repos: [default: BaseRepo],
+        mod: FooBar,
         columns: %{
           id: 2,
           name: "Boomer",
@@ -312,9 +312,9 @@ defmodule EctoFixtures.Conditioners.AssociationsTest do
       __dag__: create(),
       __data__: %{},
       brian: %{
-        model: Owner,
-        repo: Base,
-        path: "foo/bar.fixtures",
+        schema: Owner,
+        repos: [default: BaseRepo],
+        mod: FooBar,
         columns: %{
           id: 1,
           name: "Brian",
@@ -323,18 +323,18 @@ defmodule EctoFixtures.Conditioners.AssociationsTest do
         }
       },
       nissan: %{
-        model: Car,
-        repo: Base,
-        path: "foo/bar.fixtures",
+        schema: Car,
+        repos: [default: BaseRepo],
+        mod: FooBar,
         columns: %{
           id: 1,
           color: "black"
         }
       },
       tesla: %{
-        model: Car,
-        repo: Base,
-        path: "foo/bar.fixtures",
+        schema: Car,
+        repos: [default: BaseRepo],
+        mod: FooBar,
         columns: %{
           id: 2,
           color: "red"
@@ -356,18 +356,18 @@ defmodule EctoFixtures.Conditioners.AssociationsTest do
   test "loads has_many association not found in the accumulator from the data object" do
     data = %{
       nissan: %{
-        model: Car,
-        repo: Base,
-        path: "foo/bar.fixtures",
+        schema: Car,
+        repos: [default: BaseRepo],
+        mod: FooBar,
         columns: %{
           id: 1,
           color: "black"
         }
       },
       tesla: %{
-        model: Car,
-        repo: Base,
-        path: "foo/bar.fixtures",
+        schema: Car,
+        repos: [default: BaseRepo],
+        mod: FooBar,
         columns: %{
           id: 2,
           color: "red"
@@ -379,9 +379,9 @@ defmodule EctoFixtures.Conditioners.AssociationsTest do
       __dag__: create(),
       __data__: data,
       brian: %{
-        model: Owner,
-        repo: Base,
-        path: "foo/bar.fixtures",
+        schema: Owner,
+        repos: [default: BaseRepo],
+        mod: FooBar,
         columns: %{
           id: 1,
           name: "Brian",
@@ -407,9 +407,9 @@ defmodule EctoFixtures.Conditioners.AssociationsTest do
       __dag__: create(),
       __data__: %{},
       test_post: %{
-        model: Post,
-        repo: Base,
-        path: "foo/bar.fixtures",
+        schema: Post,
+        repos: [default: BaseRepo],
+        mod: FooBar,
         columns: %{
           id: 1,
           title: "Test Title",
@@ -417,9 +417,9 @@ defmodule EctoFixtures.Conditioners.AssociationsTest do
         }
       },
       test_tag_1: %{
-        model: Tag,
-        repo: Base,
-        path: "foo/bar.fixtures",
+        schema: Tag,
+        repos: [default: BaseRepo],
+        mod: FooBar,
         columns: %{
           id: 1,
           name: "Test Tag 1",
@@ -427,9 +427,9 @@ defmodule EctoFixtures.Conditioners.AssociationsTest do
         }
       },
       test_tag_2: %{
-        model: Tag,
-        repo: Base,
-        path: "foo/bar.fixtures",
+        schema: Tag,
+        repos: [default: BaseRepo],
+        mod: FooBar,
         columns: %{
           id: 2,
           name: "Test Tag 2",
@@ -468,9 +468,9 @@ defmodule EctoFixtures.Conditioners.AssociationsTest do
   test "loads has_many through association not found in the accumulator from the data object" do
     data = %{
       test_tag_1: %{
-        model: Tag,
-        repo: Base,
-        path: "foo/bar.fixtures",
+        schema: Tag,
+        repos: [default: BaseRepo],
+        mod: FooBar,
         columns: %{
           id: 1,
           name: "Test Tag 1",
@@ -478,9 +478,9 @@ defmodule EctoFixtures.Conditioners.AssociationsTest do
         }
       },
       test_tag_2: %{
-        model: Tag,
-        repo: Base,
-        path: "foo/bar.fixtures",
+        schema: Tag,
+        repos: [default: BaseRepo],
+        mod: FooBar,
         columns: %{
           id: 2,
           name: "Test Tag 2",
@@ -493,9 +493,9 @@ defmodule EctoFixtures.Conditioners.AssociationsTest do
       __dag__: create(),
       __data__: data,
       test_post: %{
-        model: Post,
-        repo: Base,
-        path: "foo/bar.fixtures",
+        schema: Post,
+        repos: [default: BaseRepo],
+        mod: FooBar,
         columns: %{
           id: 1,
           title: "Test Title",
@@ -536,9 +536,9 @@ defmodule EctoFixtures.Conditioners.AssociationsTest do
   test "dag ordering continues for deeply nested assocations" do
     data = %{
       invoice_1: %{
-        model: Invoice,
-        repo: Base,
-        path: "foo/bar.fixtures",
+        schema: Invoice,
+        repos: [default: BaseRepo],
+        mod: FooBar,
         columns: %{
           property: :property_1,
           owner: :owner_1,
@@ -546,45 +546,45 @@ defmodule EctoFixtures.Conditioners.AssociationsTest do
         }
       },
       property_1: %{
-        model: Property,
-        repo: Base,
-        path: "foo/bar.fixtures",
+        schema: Property,
+        repos: [default: BaseRepo],
+        mod: FooBar,
         columns: %{
           owner: :owner_1,
           renter: :renter_1
         }
       },
       property_2: %{
-        model: Property,
-        repo: Base,
-        path: "foo/bar.fixtures",
+        schema: Property,
+        repos: [default: BaseRepo],
+        mod: FooBar,
         columns: %{
           owner: :owner_2,
           render: :renter_2
         }
       },
       owner_1: %{
-        model: User,
-        repo: Base,
-        path: "foo/bar.fixtures",
+        schema: User,
+        repos: [default: BaseRepo],
+        mod: FooBar,
         columns: %{ }
       },
       owner_2: %{
-        model: User,
-        repo: Base,
-        path: "foo/bar.fixtures",
+        schema: User,
+        repos: [default: BaseRepo],
+        mod: FooBar,
         columns: %{ }
       },
       renter_1: %{
-        model: User,
-        repo: Base,
-        path: "foo/bar.fixtures",
+        schema: User,
+        repos: [default: BaseRepo],
+        mod: FooBar,
         columns: %{ }
       },
       renter_2: %{
-        model: User,
-        repo: Base,
-        path: "foo/bar.fixtures",
+        schema: User,
+        repos: [default: BaseRepo],
+        mod: FooBar,
         columns: %{ }
       }
     }

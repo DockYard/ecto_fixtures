@@ -1,13 +1,13 @@
 defmodule EctoFixtures.ReducerTest do
   use ExUnit.Case
-  import EctoFixtures, only: [create_acc: 1]
+  import EctoFixtures.Acc, only: [build: 1]
 
   test "will.Reducer.process parsed map to given fixture name" do
     data = %{
       owner1: %{
-        model: Owner,
-        repo: Base,
-        path: "foo/bar.fixtures",
+        schema: Owner,
+        repos: [default: BaseRepo],
+        mod: FooBar,
         columns: %{
           id: 1,
           name: "Brian",
@@ -15,9 +15,9 @@ defmodule EctoFixtures.ReducerTest do
         }
       },
       pet1: %{
-        model: Pet,
-        repo: Base,
-        path: "foo/bar.fixtures",
+        schema: Pet,
+        repos: [default: BaseRepo],
+        mod: FooBar,
         columns: %{
           woof: 1,
           name: "Boomer"
@@ -27,9 +27,9 @@ defmodule EctoFixtures.ReducerTest do
 
     expected = %{
       owner1: %{
-        model: Owner,
-        repo: Base,
-        path: "foo/bar.fixtures",
+        schema: Owner,
+        repos: [default: BaseRepo],
+        mod: FooBar,
         columns: %{
           id: 1,
           name: "Brian",
@@ -39,7 +39,7 @@ defmodule EctoFixtures.ReducerTest do
     }
 
     actual =
-      create_acc(data)
+      build(data)
       |> EctoFixtures.Reducer.process([[:owner1]])
       |> clean()
 
@@ -49,9 +49,9 @@ defmodule EctoFixtures.ReducerTest do
   test "will.Reducer.process parsed map to given group" do
     data = %{
       owner1: %{
-        model: Owner,
-        repo: Base,
-        path: "foo/bar.fixtures",
+        schema: Owner,
+        repos: [default: BaseRepo],
+        mod: FooBar,
         columns: %{
           id: 1,
           name: "Brian",
@@ -59,18 +59,18 @@ defmodule EctoFixtures.ReducerTest do
         }
       },
       pet1: %{
-        model: Pet,
-        repo: Base,
-        path: "foo/bar.fixtures",
+        schema: Pet,
+        repos: [default: BaseRepo],
+        mod: FooBar,
         columns: %{
           woof: 1,
           name: "Boomer"
         }
       },
       owner2: %{
-        model: Owner,
-        repo: Base,
-        path: "foo/bar.fixtures",
+        schema: Owner,
+        repos: [default: BaseRepo],
+        mod: FooBar,
         columns: %{
           id: 2,
           name: "Stephanie",
@@ -78,9 +78,9 @@ defmodule EctoFixtures.ReducerTest do
         }
       },
       pet2: %{
-        model: Pet,
-        repo: Base,
-        path: "foo/bar.fixtures",
+        schema: Pet,
+        repos: [default: BaseRepo],
+        mod: FooBar,
         columns: %{
           woof: 2,
           name: "Wiley"
@@ -92,9 +92,9 @@ defmodule EctoFixtures.ReducerTest do
 
     expected = %{
       owner1: %{
-        model: Owner,
-        repo: Base,
-        path: "foo/bar.fixtures",
+        schema: Owner,
+        repos: [default: BaseRepo],
+        mod: FooBar,
         columns: %{
           id: 1,
           name: "Brian",
@@ -102,9 +102,9 @@ defmodule EctoFixtures.ReducerTest do
         }
       },
       pet1: %{
-        model: Pet,
-        repo: Base,
-        path: "foo/bar.fixtures",
+        schema: Pet,
+        repos: [default: BaseRepo],
+        mod: FooBar,
         columns: %{
           woof: 1,
           name: "Boomer"
@@ -114,7 +114,7 @@ defmodule EctoFixtures.ReducerTest do
 
     actual =
       data
-      |> create_acc()
+      |> build()
       |> EctoFixtures.Reducer.process([[:one]])
       |> clean()
 
@@ -124,9 +124,9 @@ defmodule EctoFixtures.ReducerTest do
   test "will.Reducer.process parsed map to given fixture names" do
     data = %{
       owner1: %{
-        model: Owner,
-        repo: Base,
-        path: "foo/bar.fixtures",
+        schema: Owner,
+        repos: [default: BaseRepo],
+        mod: FooBar,
         columns: %{
           id: 1,
           name: "Brian",
@@ -134,9 +134,9 @@ defmodule EctoFixtures.ReducerTest do
         }
       },
       owner2: %{
-        model: Owner,
-        repo: Base,
-        path: "foo/bar.fixtures",
+        schema: Owner,
+        repos: [default: BaseRepo],
+        mod: FooBar,
         columns: %{
           id: 2,
           name: "Stephanie",
@@ -144,9 +144,9 @@ defmodule EctoFixtures.ReducerTest do
         }
       },
       pet1: %{
-        model: Pet,
-        repo: Base,
-        path: "foo/bar.fixtures",
+        schema: Pet,
+        repos: [default: BaseRepo],
+        mod: FooBar,
         columns: %{
           woof: 1,
           name: "Boomer"
@@ -156,9 +156,9 @@ defmodule EctoFixtures.ReducerTest do
 
     expected = %{
       owner1: %{
-        model: Owner,
-        repo: Base,
-        path: "foo/bar.fixtures",
+        schema: Owner,
+        repos: [default: BaseRepo],
+        mod: FooBar,
         columns: %{
           id: 1,
           name: "Brian",
@@ -166,9 +166,9 @@ defmodule EctoFixtures.ReducerTest do
         }
       },
       pet1: %{
-        model: Pet,
-        repo: Base,
-        path: "foo/bar.fixtures",
+        schema: Pet,
+        repos: [default: BaseRepo],
+        mod: FooBar,
         columns: %{
           woof: 1,
           name: "Boomer"
@@ -178,7 +178,7 @@ defmodule EctoFixtures.ReducerTest do
 
     actual =
       data
-      |> create_acc()
+      |> build()
       |> EctoFixtures.Reducer.process([[:owner1, :pet1]])
       |> clean()
 
@@ -188,9 +188,9 @@ defmodule EctoFixtures.ReducerTest do
   test "adds vertex to the digraph for new rows taken from the data" do
     data = %{
       owner: %{
-        model: Owner,
-        repo: Base,
-        path: "foo/bar.fixtures",
+        schema: Owner,
+        repos: [default: BaseRepo],
+        mod: FooBar,
         columns: %{
           id: 1,
           name: "Brian",
@@ -198,9 +198,9 @@ defmodule EctoFixtures.ReducerTest do
         }
       },
       pet: %{
-        model: Pet,
-        repo: Base,
-        path: "foo/bar.fixtures",
+        schema: Pet,
+        repos: [default: BaseRepo],
+        mod: FooBar,
         columns: %{
           woof: 1,
           name: "Boomer"
@@ -210,7 +210,7 @@ defmodule EctoFixtures.ReducerTest do
 
     acc =
       data
-      |> create_acc()
+      |> build()
       |> EctoFixtures.Reducer.process([[:pet]])
 
     assert :digraph.vertices(acc[:__dag__]) == [:pet]

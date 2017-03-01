@@ -1,17 +1,17 @@
 defmodule EctoFixtures.ReloaderTest do
   defmodule Fixtures do
-    def fixture_data() do
+    def data() do
       %{
         order_1: %{
-          model: Order,
-          repo: BaseRepo,
-          path: "orders.fixtures",
+          schema: Order,
+          repos: [default: BaseRepo],
+          mod: OrderFixtures,
           columns: %{ }
         },
         order_2: %{
-          model: Order,
-          repo: BaseRepo,
-          path: "orders.fixtures",
+          schema: Order,
+          repos: [default: BaseRepo],
+          mod: OrderFixtures,
           columns: %{ }
         }
       }

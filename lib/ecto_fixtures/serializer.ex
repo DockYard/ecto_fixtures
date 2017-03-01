@@ -1,11 +1,11 @@
 defmodule EctoFixtures.Serializer do
-  def process(acc, opts, mod) do
-    data = mod.fixture_data()
+  def process(acc, opts, mod, context \\ :default) do
+    data = mod.data()
     {row_names, opt} = reduce_names(acc, opts)
 
     Enum.reduce(row_names, acc, fn(row_name, acc) ->
       row = acc[row_name]
-      serializer = data[row_name][:serializer]
+      serializer = get_in(data, [row_name, :serializers, context])
       record = serialize(row, serializer, mod, opt)
       Map.put(acc, row_name, record)
     end)

@@ -27,13 +27,13 @@ defmodule EctoFixtures.SerializerTest do
       serializer.format(data, opts)
     end
 
-    def fixture_data() do
+    def data() do
       %{
         owner_1: %{
-          model: Owner,
-          repo: BaseRepo,
-          path: "foo/bar.fixtures",
-          serializer: Serializer,
+          schema: Owner,
+          repos: [default: BaseRepo],
+          mod: FooBar,
+          serializers: [default: Serializer],
           columns: %{
             name: "Brian",
             age: 36,
@@ -41,19 +41,19 @@ defmodule EctoFixtures.SerializerTest do
           }
         },
         owner_2: %{
-          model: Owner,
-          repo: BaseRepo,
-          path: "foo/bar.fixtures",
+          schema: Owner,
+          repos: [default: BaseRepo],
+          mod: FooBar,
           columns: %{
             name: "Stephanie",
             age: 35
           }
         },
         pet_1: %{
-          model: Pet,
-          repo: BaseRepo,
-          path: "foo/bar.fixtures",
-          serializer: Serializer,
+          schema: Pet,
+          repos: [default: BaseRepo],
+          mod: FooBar,
+          serializers: [default: Serializer],
           columns: %{
             name: "Boomer",
             owner: :owner_1

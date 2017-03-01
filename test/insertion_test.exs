@@ -1,55 +1,55 @@
 defmodule EctoFixtures.InsertionTest do
   use EctoFixtures.Integration.Case
-  import EctoFixtures, only: [create_acc: 1]
+  import EctoFixtures.Acc, only: [build: 1]
 
   @data %{
     nissan: %{
-      model: Car,
-      repo: BaseRepo,
-      path: "foo/bar.fixture",
+      schema: Car,
+      repos: [default: BaseRepo],
+      mod: FooBar,
       columns: %{
         color: "black",
         owner: :brian
       }
     },
     tesla: %{
-      model: Car,
-      repo: BaseRepo,
-      path: "foo/bar.fixture",
+      schema: Car,
+      repos: [default: BaseRepo],
+      mod: FooBar,
       columns: %{
         color: "red"
       }
     },
     toyota: %{
-      model: Car,
-      repo: BaseRepo,
-      path: "foo/bar.fixture",
+      schema: Car,
+      repos: [default: BaseRepo],
+      mod: FooBar,
       columns: %{
         color: "white"
       }
     },
     brian: %{
-      model: Owner,
-      repo: BaseRepo,
-      path: "foo/bar.fixture",
+      schema: Owner,
+      repos: [default: BaseRepo],
+      mod: FooBar,
       columns: %{
         name: "Brian",
         pet: :boomer
       }
     },
     stephanie: %{
-      model: Owner,
-      repo: BaseRepo,
-      path: "foo/bar.fixture",
+      schema: Owner,
+      repos: [default: BaseRepo],
+      mod: FooBar,
       columns: %{
         name: "Stephanie",
         cars: [:tesla, :toyota]
       }
     },
     boomer: %{
-      model: Pet,
-      repo: BaseRepo,
-      path: "foo/bar.fixture",
+      schema: Pet,
+      repos: [default: BaseRepo],
+      mod: FooBar,
       columns: %{
         name: "Boomer",
       }
@@ -58,7 +58,7 @@ defmodule EctoFixtures.InsertionTest do
 
   test "properly inserts fixtures into the database" do
     @data
-    |> create_acc()
+    |> build()
     |> EctoFixtures.Reducer.process([[:nissan, :tesla, :toyota, :brian, :stephanie, :boomer]])
     |> EctoFixtures.Insertion.process([])
 
@@ -81,31 +81,10 @@ defmodule EctoFixtures.InsertionTest do
     assert boomer.owner_id == brian.id
   end
 
-  test "does not insert rows tagged with `virtual: true`" do
-    data = %{
-      brian: %{
-        model: Owner,
-        repo: BaseRepo,
-        virtual: true,
-        columns: %{
-          name: "Brian"
-        }
-      }
-    }
-
-    create_acc(data)
-    |> EctoFixtures.Reducer.process([[:nissan, :tesla, :toyota, :brian, :stephanie, :boomer]])
-    |> EctoFixtures.Insertion.process([])
-
-    owners = BaseRepo.all(Owner)
-
-    assert length(owners) == 0
-  end
-
   test "does not insert any rows when `insert: false` is used" do
     %{nissan: nissan, tesla: tesla, toyota: toyota, brian: brian, stephanie: stephanie, boomer: boomer} =
       @data
-      |> create_acc()
+      |> build()
       |> EctoFixtures.Reducer.process([[:nissan, :tesla, :toyota, :brian, :stephanie, :boomer]])
       |> EctoFixtures.Insertion.process(false)
 
@@ -135,16 +114,16 @@ defmodule EctoFixtures.InsertionTest do
   test "inserts has_one through relationships in correct order" do
     data = %{
       foo: %{
-        model: Post,
-        repo: BaseRepo,
+        schema: Post,
+        repos: [default: BaseRepo],
         columns: %{
           title: "Test Title",
           tag: :bar
         }
       },
       bar: %{
-        model: Tag,
-        repo: BaseRepo,
+        schema: Tag,
+        repos: [default: BaseRepo],
         columns: %{
           name: "Bar Tag"
         }
@@ -153,7 +132,7 @@ defmodule EctoFixtures.InsertionTest do
 
     result =
       data
-      |> create_acc()
+      |> build()
       |> EctoFixtures.Reducer.process([[:foo]])
       |> EctoFixtures.Insertion.process([])
 
@@ -163,23 +142,23 @@ defmodule EctoFixtures.InsertionTest do
   test "inserts has_many through relationships in correct order" do
     data = %{
       foo: %{
-        model: Post,
-        repo: BaseRepo,
+        schema: Post,
+        repos: [default: BaseRepo],
         columns: %{
           title: "Test Title",
           tags: [:bar, :baz]
         }
       },
       bar: %{
-        model: Tag,
-        repo: BaseRepo,
+        schema: Tag,
+        repos: [default: BaseRepo],
         columns: %{
           name: "Bar Tag"
         }
       },
       baz: %{
-        model: Tag,
-        repo: BaseRepo,
+        schema: Tag,
+        repos: [default: BaseRepo],
         columns: %{
           name: "Baz Tag"
         }
@@ -188,7 +167,7 @@ defmodule EctoFixtures.InsertionTest do
 
     result =
       data
-      |> create_acc()
+      |> build()
       |> EctoFixtures.Reducer.process([[:foo]])
       |> EctoFixtures.Insertion.process([])
 
@@ -201,9 +180,9 @@ defmodule EctoFixtures.InsertionTest do
   test "inserts from deeply nested associations" do
     data = %{
       invoice_1: %{
-        model: Invoice,
-        repo: BaseRepo,
-        path: "foo/bar.fixtures",
+        schema: Invoice,
+        repos: [default: BaseRepo],
+        mod: FooBar,
         columns: %{
           property: :property_1,
           owner: :owner_1,
@@ -211,51 +190,51 @@ defmodule EctoFixtures.InsertionTest do
         }
       },
       property_1: %{
-        model: Property,
-        repo: BaseRepo,
-        path: "foo/bar.fixtures",
+        schema: Property,
+        repos: [default: BaseRepo],
+        mod: FooBar,
         columns: %{
           owner: :owner_1,
           renter: :renter_1
         }
       },
       property_2: %{
-        model: Property,
-        repo: BaseRepo,
-        path: "foo/bar.fixtures",
+        schema: Property,
+        repos: [default: BaseRepo],
+        mod: FooBar,
         columns: %{
           owner: :owner_2,
           render: :renter_2
         }
       },
       owner_1: %{
-        model: User,
-        repo: BaseRepo,
-        path: "foo/bar.fixtures",
+        schema: User,
+        repos: [default: BaseRepo],
+        mod: FooBar,
         columns: %{ }
       },
       owner_2: %{
-        model: User,
-        repo: BaseRepo,
-        path: "foo/bar.fixtures",
+        schema: User,
+        repos: [default: BaseRepo],
+        mod: FooBar,
         columns: %{ }
       },
       renter_1: %{
-        model: User,
-        repo: BaseRepo,
-        path: "foo/bar.fixtures",
+        schema: User,
+        repos: [default: BaseRepo],
+        mod: FooBar,
         columns: %{ }
       },
       renter_2: %{
-        model: User,
-        repo: BaseRepo,
-        path: "foo/bar.fixtures",
+        schema: User,
+        repos: [default: BaseRepo],
+        mod: FooBar,
         columns: %{ }
       }
     }
 
     data
-    |> create_acc()
+    |> build()
     |> EctoFixtures.Reducer.process([[:invoice_1]])
     |> EctoFixtures.Insertion.process([])
   end
@@ -263,9 +242,9 @@ defmodule EctoFixtures.InsertionTest do
   test "inserts from deeply nested associations with passively references assciation" do
     data = %{
       payment_1: %{
-        model: Payment,
-        repo: BaseRepo,
-        path: "foo/bar.fixtures",
+        schema: Payment,
+        repos: [default: BaseRepo],
+        mod: FooBar,
         columns: %{
           invoice: :invoice_1,
           payee: :owner_1,
@@ -273,9 +252,9 @@ defmodule EctoFixtures.InsertionTest do
         }
       },
       invoice_1: %{
-        model: Invoice,
-        repo: BaseRepo,
-        path: "foo/bar.fixtures",
+        schema: Invoice,
+        repos: [default: BaseRepo],
+        mod: FooBar,
         columns: %{
           property: :property_1,
           owner: :owner_1,
@@ -283,51 +262,51 @@ defmodule EctoFixtures.InsertionTest do
         }
       },
       property_1: %{
-        model: Property,
-        repo: BaseRepo,
-        path: "foo/bar.fixtures",
+        schema: Property,
+        repos: [default: BaseRepo],
+        mod: FooBar,
         columns: %{
           owner: :owner_1,
           renter: :renter_1
         }
       },
       property_2: %{
-        model: Property,
-        repo: BaseRepo,
-        path: "foo/bar.fixtures",
+        schema: Property,
+        repos: [default: BaseRepo],
+        mod: FooBar,
         columns: %{
           owner: :owner_2,
           render: :renter_2
         }
       },
       owner_1: %{
-        model: User,
-        repo: BaseRepo,
-        path: "foo/bar.fixtures",
+        schema: User,
+        repos: [default: BaseRepo],
+        mod: FooBar,
         columns: %{ }
       },
       owner_2: %{
-        model: User,
-        repo: BaseRepo,
-        path: "foo/bar.fixtures",
+        schema: User,
+        repos: [default: BaseRepo],
+        mod: FooBar,
         columns: %{ }
       },
       renter_1: %{
-        model: User,
-        repo: BaseRepo,
-        path: "foo/bar.fixtures",
+        schema: User,
+        repos: [default: BaseRepo],
+        mod: FooBar,
         columns: %{ }
       },
       renter_2: %{
-        model: User,
-        repo: BaseRepo,
-        path: "foo/bar.fixtures",
+        schema: User,
+        repos: [default: BaseRepo],
+        mod: FooBar,
         columns: %{ }
       }
     }
 
     data
-    |> create_acc()
+    |> build()
     |> EctoFixtures.Reducer.process([[:invoice_1]])
     |> EctoFixtures.Insertion.process([])
   end
