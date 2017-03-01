@@ -16,7 +16,10 @@ defmodule EctoFixtures.Insertion do
   end
   defp insert_row(record, false, _context), do: record
   defp insert_row(%{repos: repos} = row, true, context) do
-    repo = Keyword.get(repos, context)
+    repo = case Keyword.fetch(repos, context) do
+      :error -> Keyword.get(repos, :default)
+      {:ok, repo} -> repo
+    end
 
     insert_row(row, false, context)
     |> repo.insert!()

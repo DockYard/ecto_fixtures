@@ -22,6 +22,21 @@ defmodule EctoFixtures.SerializerTest do
     end
   end
 
+  defmodule OtherSerializer do
+    def format(data, _opts) do
+      map =
+        data
+        |> Map.from_struct()
+        |> Enum.into(%{}, fn
+          {key, value} when is_number(value) -> {key, value}
+          {key, value} when is_binary(value) -> {key, String.split(value, "") |> Enum.join("-")}
+          {key, value} -> {key, value}
+        end)
+
+      struct(data.__struct__, map)
+    end
+  end
+
   defmodule Fixtures do
     def serialize(data, serializer, opts \\ %{}) do
       serializer.format(data, opts)
@@ -33,7 +48,7 @@ defmodule EctoFixtures.SerializerTest do
           schema: Owner,
           repos: [default: BaseRepo],
           mod: FooBar,
-          serializers: [default: Serializer],
+          serializers: [default: Serializer, other: OtherSerializer],
           columns: %{
             name: "Brian",
             age: 36,
@@ -109,10 +124,11 @@ defmodule EctoFixtures.SerializerTest do
     assert data.pet_1.name == "ZOOMER"
   end
 
-  # fixtures [:owner_1, :owner_2]
-  # serialize with: &serialize_opts/1
-  # test "will use serializer opts as a function", %{data: data} do
-    # assert data.owner_1.name == "Brian-foobar"
-    # assert data.pet_1.name == "Boomer-foobar"
-  # end
+  fixture :owner_1
+  context :other
+  serialize
+  test "uses :other serializer when available, when not fallback to :default", %{data: data} do
+    assert data.owner_1.name == "B-r-i-a-n-"
+    assert data.pet_1.name == "BOOMER"
+  end
 end
