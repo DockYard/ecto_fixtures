@@ -1,7 +1,12 @@
 defmodule EctoFixtures.Reloader do
   def process(data, opts, acc, context \\ :default) do
     Enum.reduce(data, %{}, fn({record_name, record}, records) ->
-      repo = get_in(acc, [record_name, :repos, context])
+      repos = Map.get(acc[record_name], :repos, [])
+      repo = case Keyword.fetch(repos, context) do
+        :error -> Keyword.get(repos, :default)
+        {:ok, repo} -> repo
+      end
+
       record = reload_record(record, repo, reload?(record_name, opts))
 
       Map.put(records, record_name, record)
