@@ -6,9 +6,9 @@ defmodule EctoFixtures.Mixfile do
      version: "0.0.2",
      elixir: "~> 1.2",
      name: "Ecto Fixtures",
-     deps: deps,
-     package: package,
-     description: description]
+     deps: deps(),
+     package: package(),
+     description: description()]
   end
 
   # Configuration for the OTP application
