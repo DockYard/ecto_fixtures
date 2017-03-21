@@ -16,7 +16,7 @@ defmodule EctoFixtures do
   defmacro group(group) do
     quote do
       cond do
-        Keyword.keys(@fixtures) |> Enum.member?(unquote(group)) ->
+        Enum.member?(@fixtures, unquote(group)) ->
           raise ArgumentError, "#{inspect(__MODULE__)} attempting to use #{inspect(unquote(group))} as a group name but it is already claimed by a fixture"
         true -> @groups unquote(group)
       end
@@ -49,16 +49,6 @@ defmodule EctoFixtures do
     end
   end
 
-  defmacro fixture(name, columns) do
-    quote do
-      cond do
-        Enum.member?(@groups, unquote(name)) ->
-          raise ArgumentError, "#{inspect(__MODULE__)} attempting to use #{inspect(unquote(name))} as a fixture name but it is already claimed as the group name"
-        true -> @fixtures {unquote(name), unquote(columns)}
-      end
-    end
-  end
-
   defmacro serializer(serializer, context \\ :default) do
     quote do
       @serializers {unquote(context), unquote(serializer)}
@@ -67,38 +57,47 @@ defmodule EctoFixtures do
 
   defmacro __before_compile__(_env) do
     quote do
-      @data Enum.reduce(@fixtures, %{}, fn({name, columns}, data) ->
-        data
-        |> Map.fetch(name)
-        |> case do
-          :error ->
-            attributes = %{
-              mod: __MODULE__,
-              repos: @repos,
-              schema: @schema,
-              columns: columns
-            }
+      def data do
+        Enum.into(@fixtures, %{}, fn(name) ->
+          columns = apply(__MODULE__, name, [])
 
-            attributes = case @serializers do
-              [] -> attributes
-              serializers -> Map.put(attributes, :serializers, serializers)
-            end
+          attributes = %{
+            mod: __MODULE__,
+            repos: @repos,
+            schema: @schema,
+            columns: columns
+          }
 
-            attributes = case @groups do
-              [] -> attributes
-              groups -> Map.put(attributes, :groups, groups)
-            end
+          attributes = case @serializers do
+            [] -> attributes
+            serializers -> Map.put(attributes, :serializers, serializers)
+          end
 
-            Map.put(data, name, attributes)
+          attributes = case @groups do
+            [] -> attributes
+            groups -> Map.put(attributes, :groups, groups)
+          end
 
-          {:ok, _columns} ->
-            raise ArgumentError, "#{inspect(__MODULE__)} fixture #{inspect(name)} already declared"
-        end
-      end)
-
-      def data(), do: @data
+          {name, attributes}
+        end)
+      end
     end
   end
+
+  @reserved_names [:repo, :schema, :serializer, :group, :groups, :data]
+
+  def __on_definition__(env, :def, name, _args, _guards, _expr) when not name in @reserved_names do
+    module = env.module
+    groups = Module.get_attribute(module, :groups)
+
+    cond do
+      Enum.member?(groups, name) ->
+        raise ArgumentError, "#{inspect(module)} attempting to use #{inspect(name)} as a fixture name but it is already claimed as the group name"
+      true ->
+        Module.put_attribute(env.module, :fixtures, name)
+    end
+  end
+  def __on_definition__(_env, _type, _name, _args, _guards, _expr), do: nil
 
   defmacro __using__(_opts) do
     quote do
@@ -111,6 +110,7 @@ defmodule EctoFixtures do
       import EctoFixtures
 
       @before_compile EctoFixtures
+      @on_definition EctoFixtures
     end
   end
 end

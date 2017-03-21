@@ -11,13 +11,13 @@ defmodule EctoFixtures.FixturesTest do
     serializer AdminOwnerView, :admin
     group :owners
 
-    fixture :one, %{
-      name: "One"
-    }
+    def one do
+      %{ name: "One" }
+    end
 
-    fixture :two, %{
-      name: "Two"
-    }
+    def two do
+      %{ name: "Two" }
+    end
   end
 
   test "fixture module compiles data" do
@@ -56,9 +56,9 @@ defmodule EctoFixtures.FixturesTest do
       schema Owner
       group :owners
 
-      fixture :one, %{
-        name: "One"
-      }
+      def one do
+        %{ name: "One" }
+      end
     end
 
     expected = %{
@@ -86,9 +86,9 @@ defmodule EctoFixtures.FixturesTest do
       serializer OwnerView
       serializer AdminOwnerView, :admin
 
-      fixture :one, %{
-        name: "One"
-      }
+      def one do
+        %{ name: "One" }
+      end
     end
 
     expected = %{
@@ -106,30 +106,6 @@ defmodule EctoFixtures.FixturesTest do
     assert BOwnerFixtures.data() == expected
   end
 
-  test "raises error when attempting to redefine existing fixture" do
-    try do
-      defmodule COwnerFixtures do
-        use EctoFixtures
-
-        repo BaseRepo
-        schema Owner
-
-        fixture :one, %{
-          name: "One"
-        }
-
-        fixture :one, %{
-          name: "Two"
-        }
-      end
-
-      raise "should not hit this raise"
-    rescue
-      error in [ArgumentError] ->
-        assert error.message == "EctoFixtures.FixturesTest.COwnerFixtures fixture :one already declared"
-    end
-  end
-
   test "raises an error when attempting to use a fixture name already set as a group name" do
     try do
       defmodule DOwnerFixtures do
@@ -139,9 +115,9 @@ defmodule EctoFixtures.FixturesTest do
         schema Owner
         group :one
 
-        fixture :one, %{
-          name: "One"
-        }
+        def one do
+          %{ name: "One" }
+        end
       end
 
       raise "should not hit this raise"
@@ -153,15 +129,15 @@ defmodule EctoFixtures.FixturesTest do
 
   test "raises an error when attempting to use a group name that a fixture has already claimed" do
     try do
-      defmodule DOwnerFixtures do
+      defmodule EOwnerFixtures do
         use EctoFixtures
 
         repo BaseRepo
         schema Owner
 
-        fixture :one, %{
-          name: "One"
-        }
+        def one do
+          %{ name: "One" }
+        end
 
         group :one
       end
@@ -169,28 +145,28 @@ defmodule EctoFixtures.FixturesTest do
       raise "should not hit this raise"
     rescue
       error in [ArgumentError] ->
-        assert error.message == "EctoFixtures.FixturesTest.DOwnerFixtures attempting to use :one as a group name but it is already claimed by a fixture"
+        assert error.message == "EctoFixtures.FixturesTest.EOwnerFixtures attempting to use :one as a group name but it is already claimed by a fixture"
     end
   end
 
   test "can take multiple groups" do
-    defmodule EOwnerFixtures do
+    defmodule FOwnerFixtures do
       use EctoFixtures
 
       repo BaseRepo
       schema Owner
       groups [:one, :two]
 
-      fixture :brian, %{
-        name: "Brian"
-      }
+      def brian do
+        %{ name: "Brian" }
+      end
     end
 
     expected = %{
       brian: %{
         repos: [default: BaseRepo],
         schema: Owner,
-        mod: EOwnerFixtures,
+        mod: FOwnerFixtures,
         groups: [:one, :two],
         columns: %{
           name: "Brian"
@@ -198,21 +174,21 @@ defmodule EctoFixtures.FixturesTest do
       }
     }
 
-    assert EOwnerFixtures.data() == expected
+    assert FOwnerFixtures.data() == expected
   end
 
   test "raises error when non-list passed to &groups/1" do
     try do
-      defmodule FOwnerFixtures do
+      defmodule GOwnerFixtures do
         use EctoFixtures
 
         repo BaseRepo
         schema Owner
         groups :one
 
-        fixture :brian, %{
-          name: "Brian"
-        }
+        def brian do
+          %{ name: "Brian" }
+        end
       end
     rescue
       error in [ArgumentError] ->
@@ -222,16 +198,16 @@ defmodule EctoFixtures.FixturesTest do
 
   test "raises error when list passed to &group/1" do
     try do
-      defmodule FOwnerFixtures do
+      defmodule HOwnerFixtures do
         use EctoFixtures
 
         repo BaseRepo
         schema Owner
         group [:one, :two]
 
-        fixture :brian, %{
-          name: "Brian"
-        }
+        def brian do
+          %{ name: "Brian" }
+        end
       end
     rescue
       error in [ArgumentError] ->

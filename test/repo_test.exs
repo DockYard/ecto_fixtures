@@ -7,9 +7,9 @@ defmodule EctoFixtures.RepoTest do
     repo BaseRepo
     schema Owner
 
-    fixture :brian, %{
-      name: "Brian"
-    }
+    def brian do
+      %{ name: "Brian" }
+    end
   end
 
   defmodule Fixtures.Cars do
@@ -18,9 +18,9 @@ defmodule EctoFixtures.RepoTest do
     repo BaseRepo
     schema Car
 
-    fixture :nissan, %{
-      color: "black"
-    }
+    def nissan do
+      %{ color: "black" }
+    end
   end
 
   test "ensure fixture repo compiles attributes" do
@@ -62,9 +62,9 @@ defmodule EctoFixtures.RepoTest do
       repo BaseRepo
       schema Owner
 
-      fixture :brian, %{
-        name: "Other Brian"
-      }
+      def brian do
+        %{ name: "Oter Brian" }
+      end
     end
 
     try do
@@ -90,13 +90,13 @@ defmodule EctoFixtures.RepoTest do
       schema Owner
       groups [:one, :two]
 
-      fixture :brian, %{
-        name: "Brian"
-      }
+      def brian do
+        %{ name: "Brian" }
+      end
 
-      fixture :stephanie, %{
-        name: "Stephanie"
-      }
+      def stephanie do
+        %{ name: "Stephanie" }
+      end
     end
 
     defmodule Fixtures.Group2 do
@@ -106,9 +106,9 @@ defmodule EctoFixtures.RepoTest do
       schema Owner
       group :one
 
-      fixture :thomas, %{
-        name: "Thomas"
-      }
+      def thomas do
+        %{ name: "Thomas" }
+      end
     end
 
     defmodule GroupedFixtures do
