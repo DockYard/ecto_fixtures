@@ -1,8 +1,8 @@
-# EctoFixtures #
+# EctoFixtures [![Build Status](https://secure.travis-ci.org/DockYard/ecto_fixtures.svg?branch=master)](http://travis-ci.org/dockyard/ecto_fixtures)
 
 Fixtures for Ecto
 
-[![Build Status](https://secure.travis-ci.org/DockYard/ecto_fixtures.svg?branch=master)](http://travis-ci.org/dockyard/ecto_fixtures)
+**[EctoFixtures is built and maintained by DockYard, contact us for expert Elixir and Phoenix consulting](https://dockyard.com/phoenix-consulting)**.
 
 ## Usage ##
 
