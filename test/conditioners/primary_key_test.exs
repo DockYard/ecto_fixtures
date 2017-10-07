@@ -2,96 +2,100 @@ defmodule EctoFixtures.Conditioners.PrimaryKeyTest do
   use ExUnit.Case
 
   test "generates primary key value if not present for each row" do
-    data = %{foo: [
-      owners: %{
-        model: Owner,
-        repo: Base,
-        rows: [
-          brian: %{data: %{name: "Brian"}},
-          stephanie: %{data: %{name: "Stephanie"}}
-        ]
+    acc = %{
+      owner: %{
+        schema: Owner,
+        repos: [default: BaseRepo],
+        mod: FooBar,
+        columns: %{
+          name: "Brian",
+          age: 36
+        }
       }
-    ]}
+    }
 
-    assert data[:foo][:owners][:rows][:brian][:data][:id] == nil
-    assert data[:foo][:owners][:rows][:stephanie][:data][:id] == nil
+    assert acc[:owner][:columns][:id] == nil
 
-    data = EctoFixtures.condition(data)
+    acc = EctoFixtures.Conditioners.PrimaryKey.process(acc, :owner)
 
-    assert is_integer(data[:foo][:owners][:rows][:brian][:data][:id])
-    assert is_integer(data[:foo][:owners][:rows][:stephanie][:data][:id])
+    assert is_integer(acc[:owner][:columns][:id])
   end
 
   test "supports overriden primary keys" do
-    data = %{foo: [
-      pets: %{
-        model: Pet,
-        repo: Base,
-        rows: [boomer: %{data: %{name: "Boomer"}}]
+    acc = %{
+      pet: %{
+        schema: Pet,
+        repos: [default: BaseRepo],
+        mod: FooBar,
+        columns: %{
+          name: "Boomer"
+        }
       }
-    ]}
+    }
 
-    assert data[:foo][:pets][:rows][:boomer][:data][:woof] == nil
+    assert acc[:pet][:columns][:woof] == nil
 
-    data = EctoFixtures.condition(data)
+    acc = EctoFixtures.Conditioners.PrimaryKey.process(acc, :pet)
 
-    assert data[:foo][:pets][:rows][:boomer][:data][:woof] != nil
-    assert is_integer(data[:foo][:pets][:rows][:boomer][:data][:woof])
+    assert is_integer(acc[:pet][:columns][:woof])
   end
 
   test "supports uuid for primary key" do
-    data = %{foo: [
-      cars: %{
-        model: Car,
-        repo: Base,
-        rows: [nissan: %{data: %{color: "black"}}]
+    acc = %{
+      car: %{
+        schema: Car,
+        repos: [default: BaseRepo],
+        mod: FooBar,
+        columns: %{
+          color: "black"
+        }
       }
-    ]}
+    }
 
-    assert data[:foo][:cars][:rows][:nissan][:data][:id] == nil
+    assert acc[:car][:columns][:id] == nil
 
-    data = EctoFixtures.condition(data)
+    acc = EctoFixtures.Conditioners.PrimaryKey.process(acc, :car)
 
-    assert data[:foo][:cars][:rows][:nissan][:data][:id] != nil
-    assert is_binary(data[:foo][:cars][:rows][:nissan][:data][:id])
+    assert is_binary(acc[:car][:columns][:id])
   end
 
   test "supports no primary key" do
-    data = %{foo: [
-      books: %{
-        model: Book,
-        repo: Base,
-        rows: [one: %{data: %{title: "Go Dog Go!"}}]
+    acc = %{
+      book: %{
+        schema: Book,
+        repos: [default: BaseRepo],
+        mod: FooBar,
+        columns: %{
+          title: "Go Dog Go!"
+        }
       }
-    ]}
+    }
 
-    assert data[:foo][:books][:rows][:one][:id] == nil
+    assert acc[:book][:columns][:id] == nil
 
-    data = EctoFixtures.condition(data)
+    acc = EctoFixtures.Conditioners.PrimaryKey.process(acc, :book)
 
-    assert data[:foo][:books][:rows][:one][:id] == nil
+    assert acc[:book][:columns][:id] == nil
   end
 
   test "don't generate id if one already exists" do
-    data = %{foo: [
-      cars: %{
-        model: Car,
-        repo: Base,
-        rows: [nissan: %{data: %{color: "black", id: "abc"}}]
-      },
-      owners: %{
-        model: Owner,
-        repo: Base,
-        rows: [brian: %{data: %{name: "Brian", id: 123}}]
+    acc = %{
+      owner: %{
+        schema: Owner,
+        repos: [default: BaseRepo],
+        mod: FooBar,
+        columns: %{
+          id: 123,
+          name: "Brian",
+          age: 36
+        }
       }
-    ]}
+    }
 
-    assert data[:foo][:cars][:rows][:nissan][:data][:id] == "abc"
-    assert data[:foo][:owners][:rows][:brian][:data][:id] == 123
+    assert acc[:owner][:columns][:id] == 123
 
-    data = EctoFixtures.condition(data)
+    acc = EctoFixtures.Conditioners.PrimaryKey.process(acc, :owner)
 
-    assert data[:foo][:cars][:rows][:nissan][:data][:id] == "abc"
-    assert data[:foo][:owners][:rows][:brian][:data][:id] == 123
+    assert acc[:owner][:columns][:id] == 123
   end
 end

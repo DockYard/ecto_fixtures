@@ -4,35 +4,111 @@ Fixtures for Ecto
 
 **[EctoFixtures is built and maintained by DockYard, contact us for expert Elixir and Phoenix consulting](https://dockyard.com/phoenix-consulting)**.
 
-## Usage ##
+## Installation
 
-Fixture files should be stored in `test/fixtures/`. The format of a
-fixture file is as:
+Add `ecto_fixtures` to your `mix.exs` as a dependency.
+You will likely only want it for the `test` environment:
 
 ```elixir
-# test/fixtures/accounts.exs
+  {:ecto_fixtures, '~> 0.1.0', only: :test}
+```
 
-accounts model: Account, repo: Repo do
-  test do
-    email "test@example.com"
-    name "Brian Cardarella"
-    password_hash :crypto.sha("password")
-  end
+Run `mix deps.get` from the command line.
+
+Start by creating a new `Fixtures` module.
+
+**Note** the module file name should be `.ex` and not `.exs`.
+
+### With a Phoenix App
+
+If you are writing a Phoenix app the best place to put this will be
+in `test/support/fixtures.ex`
+
+```elixir
+demofule MyApp.Test.Fixtures do
+  use EctoFixtures
 end
 ```
 
+### Without a Phoenix App
+
+If you are not using Phoenix `test/support` is still a good option but
+you likely need to add `test/support` to the load paths. You can do this
+by editing `mix.exs`:
+
+In the `project` function add:
+
+```elixir
+elixirc_paths: elixirc_paths(Mix.env)
+```
+
+Then add the following two function definitions:
+
+```elixir
+defp elixirc_paths(:test), do: ["lib", "test/support"]
+defp elixirc_paths(_),     do: ["lib"]
+```
+
+This will instruct Elixir that for the `test` environment files found
+in `test/support` should be compiled.
+
+## Writing your first fixture
+
+Fixture files should be stored in `test/fixtures/`. Let's create a
+user fixture at `test/fixtures/users.fixtures`
+
+```elixir
+@repo MyApp.Repo
+@model MyApp.User
+
+brian do
+  name "Brian"
+end
+
+stephanie do
+  name "Stephanie"
+end
+```
+
+The `@repo` and `@model` values will apply to all records that follow.
+We can redefine these values at any point and the records that follow
+will inherit that new value:
+
+```elixir
+@repo MyApp.RepoA
+@model MyApp.User
+
+brian do
+  name "Brian"
+end
+
+@repo MyApp.RepoB
+
+stephanie do
+  name "Stephanie"
+end
+```
+
+For the `brian` record it will use `MyApp.RepoA` for db insertion. And
+`stephanie` will use `MyApp.RepoB`. You can change the model value as
+well but we recommend not mixing model types in a given fixture file, it
+can get difficult to maintain.
+
+## Using your fixtures
+
 In your test file you can access the fixture sets with the
-by tagging each test with the fixtures you want to load then 
+by tagging each test with the fixtures you want to load then
 pattern matching on the `data` field for the `context` argument.
 
 ```elixir
 defmodule MyTestCase do
   use ExUnit.Case
-  use EctoFixtures
+  use MyApp.Test.Fixtures
 
-  @tag fixtures: :accounts
+  fixtures [:brian, :stephanie]
   test "data test", %{data: data}  do
-    assert data.accounts.test.email == "test@example.com"
+    assert data.brian.name == "Brian"
+    assert data.stephanie.name == "Stephanie"
   end
 end
 ```
@@ -44,13 +120,54 @@ returned from `fixtures/1` is actually an `Ecto.Model`.
 ```elixir
 defmodule MyTestCase do
   use ExUnit.Case
-  use EctoFixtures
+  use MyApp.Test.Fixtures
 
   test "database data is inserted and equal to data set", %{data: data} do
-    assert data.accounts.test == Repo.get(Account, accounts.test.id)
+    assert data.brian == Repo.get(MyApp.User, data.brian.id)
   end
 end
 ```
+
+Primary key values are automatically generated for you. Their value is
+consistent across test runs.
+
+### Using multiple fixtures
+
+You can use both the `fixtures` and `fixture` macros before each test
+as many times as you wish to enable the formatting and grouping you
+prefer:
+
+```elixir
+defmodule MyTestCase do
+  use ExUnit.Case
+  use MyApp.Test.Fixtures
+
+  fixture :brian
+  fixtures [:boomer, :wiley]
+  fixture :stephanie
+  test "let's do this", %{data: data} do
+    ...
+  end
+end
+```
+
+## Serialization
+
+If you are testing an API and that API is returning serialized
+data. It can be very verbose to have to grab the fixture data, serialize
+it, and assert it against the payload data. Having to repeat this
+process over many tests can lead to a lot of repeated code. Let's see
+how EctoFixtures makes this much easier.
+
+### Define the serializer in the fixture file
+
+In each fixture file you can define a serializer module that will be
+used
+
+EctoFixtures will coalesce all of the data for you properly and
+performantly. There is no perf penalty to breaking things out in this
+way.
+
 
 ## Avoiding Inserts
 
