@@ -108,7 +108,8 @@ defmodule EctoFixtures do
       Module.register_attribute(__MODULE__, :serializers, accumulate: true)
 
       import EctoFixtures
-
+      import EctoFixtures.Case
+      
       @before_compile EctoFixtures
       @on_definition EctoFixtures
     end
