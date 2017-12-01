@@ -163,6 +163,6 @@ defmodule Order do
   use Ecto.Schema
 
   schema "orders" do
-    field :cost
+    field :cost, :integer
   end
 end
