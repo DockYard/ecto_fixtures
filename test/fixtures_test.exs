@@ -12,11 +12,11 @@ defmodule EctoFixtures.FixturesTest do
     group :owners
 
     def one do
-      %{ name: "One" }
+      %{name: "One"}
     end
 
     def two do
-      %{ name: "Two" }
+      %{name: "Two"}
     end
   end
 
@@ -29,7 +29,8 @@ defmodule EctoFixtures.FixturesTest do
         serializers: [admin: AdminOwnerView, default: OwnerView],
         groups: [:owners],
         columns: %{
-          name: "One"
+          name: "One",
+          id: 664243336
         }
       },
       two: %{
@@ -39,7 +40,8 @@ defmodule EctoFixtures.FixturesTest do
         serializers: [admin: AdminOwnerView, default: OwnerView],
         groups: [:owners],
         columns: %{
-          name: "Two"
+          name: "Two",
+          id: 397987669
         }
       }
     }
@@ -57,7 +59,7 @@ defmodule EctoFixtures.FixturesTest do
       group :owners
 
       def one do
-        %{ name: "One" }
+        %{name: "One"}
       end
     end
 
@@ -68,7 +70,8 @@ defmodule EctoFixtures.FixturesTest do
         mod: EctoFixtures.FixturesTest.AOwnerFixtures,
         groups: [:owners],
         columns: %{
-          name: "One"
+          name: "One",
+          id: 664243336
         }
       }
     }
@@ -87,7 +90,7 @@ defmodule EctoFixtures.FixturesTest do
       serializer AdminOwnerView, :admin
 
       def one do
-        %{ name: "One" }
+        %{name: "One"}
       end
     end
 
@@ -98,7 +101,8 @@ defmodule EctoFixtures.FixturesTest do
         mod: EctoFixtures.FixturesTest.BOwnerFixtures,
         serializers: [admin: AdminOwnerView, default: OwnerView],
         columns: %{
-          name: "One"
+          name: "One",
+          id: 664243336
         }
       }
     }
@@ -116,7 +120,7 @@ defmodule EctoFixtures.FixturesTest do
         group :one
 
         def one do
-          %{ name: "One" }
+          %{name: "One"}
         end
       end
 
@@ -136,7 +140,7 @@ defmodule EctoFixtures.FixturesTest do
         schema Owner
 
         def one do
-          %{ name: "One" }
+          %{name: "One"}
         end
 
         group :one
@@ -158,7 +162,7 @@ defmodule EctoFixtures.FixturesTest do
       groups [:one, :two]
 
       def brian do
-        %{ name: "Brian" }
+        %{name: "Brian"}
       end
     end
 
@@ -169,7 +173,8 @@ defmodule EctoFixtures.FixturesTest do
         mod: FOwnerFixtures,
         groups: [:one, :two],
         columns: %{
-          name: "Brian"
+          name: "Brian",
+          id: 613173056
         }
       }
     }
@@ -187,7 +192,7 @@ defmodule EctoFixtures.FixturesTest do
         groups :one
 
         def brian do
-          %{ name: "Brian" }
+          %{name: "Brian"}
         end
       end
     rescue
@@ -206,7 +211,7 @@ defmodule EctoFixtures.FixturesTest do
         group [:one, :two]
 
         def brian do
-          %{ name: "Brian" }
+          %{name: "Brian"}
         end
       end
     rescue

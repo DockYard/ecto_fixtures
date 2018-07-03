@@ -1,8 +1,13 @@
 defmodule EctoFixtures.Repo do
+  alias EctoFixtures.{Associations, Dag, Dag.Vertex}
+
   defmacro __using__([with: mods]) do
     quote do
       @fixture_mods unquote(mods)
 
+      # This will force all of the fixture
+      # mods to be declared as `required`
+      # and enforce proper load order
       for mod <- @fixture_mods do
         quote do
           require unquote(mod)
@@ -15,31 +20,30 @@ defmodule EctoFixtures.Repo do
 
   defmacro __before_compile__(_env) do
     quote do
-      @data Enum.reduce(@fixture_mods, %{}, fn(mod, data) ->
-        mod.data()
-        |> Enum.reduce(data, fn({name, attributes}, data) ->
-          case Map.fetch(data, name) do
-            :error ->
-              {groups, attributes} = Map.pop(attributes, :groups)
+      @graph EctoFixtures.Repo.build_graph(@fixture_mods)
 
-              data = Map.put(data, name, attributes)
-
-              groups
-              |> List.wrap()
-              |> Enum.reduce(data, fn(group, data) ->
-                case Map.fetch(data, group) do
-                  :error -> Map.put(data, group, [name])
-                  {:ok, grouped_fixtures} ->
-                    Map.put(data, group, List.insert_at(grouped_fixtures, -1, name))
-                end
-              end)
-            {:ok, other_attributes} ->
-              raise ArgumentError, "#{inspect(attributes.mod)} attempted to define fixture #{inspect(name)} but that fixture name is already being used in #{inspect(other_attributes.mod)}"
-          end
-        end)
-      end)
-
-      def data(), do: @data
+      def graph(), do: @graph
     end
+  end
+
+  def build_graph(mods) do
+    mods
+    |> Enum.reduce(%Dag{}, &insert_vertices/2)
+    |> build_associations()
+  end
+
+  defp insert_vertices(mod, graph) do
+    Enum.reduce(mod.data(), graph, fn({label, attributes}, graph) ->
+      case Dag.fetch_vertex(graph, label) do
+        :error -> Dag.add_vertex(graph, label, attributes)
+        {:ok, %Vertex{value: other_attributes}} ->
+          raise ArgumentError, "#{inspect(attributes.mod)} attempted to define fixture #{inspect(label)} but that fixture name is already being used in #{inspect(other_attributes.mod)}"
+      end
+    end)
+  end
+
+  defp build_associations(graph) do
+    Map.keys(graph.vertices)
+    |> Enum.reduce(graph, &Associations.process/2)
   end
 end

@@ -1,4 +1,6 @@
 defmodule EctoFixtures do
+  alias EctoFixtures.PrimaryKey
+
   defmacro group(name) when is_list(name) do
     quote do
       raise ArgumentError, "you attempted to pass #{inspect(unquote(name))} to &group/1 but it does not accept lists. Perhaps you need to use &groups/1 instead?"
@@ -58,7 +60,7 @@ defmodule EctoFixtures do
   defmacro __before_compile__(_env) do
     quote do
       def data do
-        Enum.into(@fixtures, %{}, fn(name) ->
+        Enum.reduce(@fixtures, %{}, fn(name, data) ->
           columns = apply(__MODULE__, name, [])
 
           attributes = %{
@@ -67,6 +69,8 @@ defmodule EctoFixtures do
             schema: @schema,
             columns: columns
           }
+
+          attributes = PrimaryKey.process(attributes, name)
 
           attributes = case @serializers do
             [] -> attributes
@@ -78,7 +82,7 @@ defmodule EctoFixtures do
             groups -> Map.put(attributes, :groups, groups)
           end
 
-          {name, attributes}
+          Map.put(data, name, attributes)
         end)
       end
     end

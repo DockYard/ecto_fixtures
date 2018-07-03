@@ -1,6 +1,8 @@
 defmodule EctoFixtures.RepoTest do
   use ExUnit.Case
 
+  alias EctoFixtures.Dag
+
   defmodule Fixtures.Owners do
     use EctoFixtures
 
@@ -8,7 +10,7 @@ defmodule EctoFixtures.RepoTest do
     schema Owner
 
     def brian do
-      %{ name: "Brian" }
+      %{name: "Brian", cars: [:nissan]}
     end
   end
 
@@ -19,7 +21,7 @@ defmodule EctoFixtures.RepoTest do
     schema Car
 
     def nissan do
-      %{ color: "black" }
+      %{color: "black"}
     end
   end
 
@@ -31,15 +33,16 @@ defmodule EctoFixtures.RepoTest do
       ]
     end
 
-    data = CompiledFixtures.data()
+    graph = CompiledFixtures.graph()
 
-    expected = %{
+    values = %{
       brian: %{
         schema: Owner,
         mod: Fixtures.Owners,
         repos: [default: BaseRepo],
         columns: %{
-          name: "Brian"
+          name: "Brian",
+          id: 613173056
         }
       },
       nissan: %{
@@ -47,12 +50,15 @@ defmodule EctoFixtures.RepoTest do
         mod: Fixtures.Cars,
         repos: [default: BaseRepo],
         columns: %{
-          color: "black"
+          color: "black",
+          id: "bacf0c40-6efb-5ed8-a4ba-204b153749ca",
+          owner_id: 613173056
         }
       }
     }
 
-    assert data == expected
+    assert Dag.get_vertex(graph, :brian).value == values[:brian]
+    assert Dag.get_vertex(graph, :nissan).value == values[:nissan]
   end
 
   test "raise if another fixture name is already defined" do
@@ -63,7 +69,7 @@ defmodule EctoFixtures.RepoTest do
       schema Owner
 
       def brian do
-        %{ name: "Oter Brian" }
+        %{name: "Other Brian"}
       end
     end
 
@@ -82,71 +88,80 @@ defmodule EctoFixtures.RepoTest do
     end
   end
 
-  test "extracts groups into higher level" do
-    defmodule Fixtures.Group1 do
-      use EctoFixtures
+  # test "extracts groups into higher level" do
+  #   defmodule Fixtures.Group1 do
+  #     use EctoFixtures
 
-      repo BaseRepo
-      schema Owner
-      groups [:one, :two]
+  #     repo BaseRepo
+  #     schema Owner
+  #     groups [:one, :two]
 
-      def brian do
-        %{ name: "Brian" }
-      end
+  #     def brian do
+  #       %{name: "Brian"}
+  #     end
 
-      def stephanie do
-        %{ name: "Stephanie" }
-      end
-    end
+  #     def stephanie do
+  #       %{name: "Stephanie"}
+  #     end
+  #   end
 
-    defmodule Fixtures.Group2 do
-      use EctoFixtures
+  #   defmodule Fixtures.Group2 do
+  #     use EctoFixtures
 
-      repo BaseRepo
-      schema Owner
-      group :one
+  #     repo BaseRepo
+  #     schema Owner
+  #     group :one
 
-      def thomas do
-        %{ name: "Thomas" }
-      end
-    end
+  #     def thomas do
+  #       %{name: "Thomas"}
+  #     end
+  #   end
 
-    defmodule GroupedFixtures do
-      use EctoFixtures.Repo, with: [
-        Fixtures.Group1,
-        Fixtures.Group2
-      ]
-    end
+  #   defmodule GroupedFixtures do
+  #     use EctoFixtures.Repo, with: [
+  #       Fixtures.Group1,
+  #       Fixtures.Group2
+  #     ]
+  #   end
 
-    expected = %{
-      brian: %{
-        repos: [default: BaseRepo],
-        schema: Owner,
-        mod: Fixtures.Group1,
-        columns: %{
-          name: "Brian"
-        }
-      },
-      stephanie: %{
-        repos: [default: BaseRepo],
-        schema: Owner,
-        mod: Fixtures.Group1,
-        columns: %{
-          name: "Stephanie"
-        }
-      },
-      thomas: %{
-        repos: [default: BaseRepo],
-        schema: Owner,
-        mod: Fixtures.Group2,
-        columns: %{
-          name: "Thomas"
-        }
-      },
-      one: [:brian, :stephanie, :thomas],
-      two: [:brian, :stephanie]
-    }
+  #   values = %{
+  #     brian: %{
+  #       repos: [default: BaseRepo],
+  #       schema: Owner,
+  #       mod: Fixtures.Group1,
+  #       columns: %{
+  #         name: "Brian",
+  #         id: 613173056
+  #       }
+  #     },
+  #     stephanie: %{
+  #       repos: [default: BaseRepo],
+  #       schema: Owner,
+  #       mod: Fixtures.Group1,
+  #       columns: %{
+  #         name: "Stephanie",
+  #         id: 1046141125
+  #       }
+  #     },
+  #     thomas: %{
+  #       repos: [default: BaseRepo],
+  #       schema: Owner,
+  #       mod: Fixtures.Group2,
+  #       columns: %{
+  #         name: "Thomas",
+  #         id: 295706741
+  #       }
+  #     },
+  #     one: [:brian, :stephanie, :thomas],
+  #     two: [:brian, :stephanie]
+  #   }
 
-    assert GroupedFixtures.data() == expected
-  end
+  #   graph = GroupedFixtures.graph()
+
+  #   assert Dag.get_vertex(graph, :brian).value == values[:brian]
+  #   assert Dag.get_vertex(graph, :stephanie).value == values[:stephanie]
+  #   assert Dag.get_vertex(graph, :thomas).value == values[:thomas]
+  #   assert Dag.get_vertex(graph, :one).value == values[:one]
+  #   assert Dag.get_vertex(graph, :two).value == values[:two]
+  # end
 end

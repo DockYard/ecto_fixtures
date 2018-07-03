@@ -6,10 +6,10 @@ defmodule EctoFixtures.Mixfile do
      version: "0.0.2",
      elixir: "~> 1.3",
      name: "Ecto Fixtures",
-     deps: deps,
-     package: package,
+     deps: deps(),
+     package: package(),
      elixirc_paths: elixirc_paths(Mix.env),
-     description: description]
+     description: description()]
   end
 
   # Configuration for the OTP application
@@ -19,7 +19,7 @@ defmodule EctoFixtures.Mixfile do
     [applications: [:logger, :uuid, :ecto]]
   end
 
-  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(:test), do: elixirc_paths(:dev) |> Enum.concat(["test/support"])
   defp elixirc_paths(_env), do: ["lib"]
 
   def description do

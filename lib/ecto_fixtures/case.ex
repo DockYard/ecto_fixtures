@@ -77,17 +77,17 @@ defmodule EctoFixtures.Case do
             {:ok, ctx} -> ctx
           end
 
-        acc =
-          mod.data()
-          |> EctoFixtures.Acc.build()
-          |> EctoFixtures.Reducer.process(context.registered.fixtures)
-          |> EctoFixtures.Transform.process(context.registered.transforms)
+        # acc =
+        #   mod.graph()
+        #   |> EctoFixtures.Acc.build()
+        #   |> EctoFixtures.Reducer.process(context.registered.fixtures)
+        #   |> EctoFixtures.Transform.process(context.registered.transforms)
 
-        data =
-          acc
-          |> EctoFixtures.Insertion.process(context.registered.insert, ctx)
-          |> EctoFixtures.Reloader.process(context.registered.reload, acc, ctx)
-          |> EctoFixtures.Serializer.process(context.registered.serialize, mod, ctx)
+        # data =
+        #   acc
+        #   |> EctoFixtures.Insertion.process(context.registered.insert, ctx)
+        #   |> EctoFixtures.Reloader.process(context.registered.reload, acc, ctx)
+        #   |> EctoFixtures.Serializer.process(context.registered.serialize, mod, ctx)
 
         {:ok, [data: data]}
       end
