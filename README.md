@@ -16,13 +16,13 @@ accounts model: Account, repo: Repo do
   test do
     email "test@example.com"
     name "Brian Cardarella"
-    password_hash :crypto.sha("password")
+    password_hash :crypto.hash(:sha, "password")
   end
 end
 ```
 
 In your test file you can access the fixture sets with the
-by tagging each test with the fixtures you want to load then 
+by tagging each test with the fixtures you want to load then
 pattern matching on the `data` field for the `context` argument.
 
 ```elixir
@@ -184,7 +184,7 @@ end
 ecto_fixtures will determine the assocation type being made and ensure
 that child records are always inserted *after* the parent record to
 avoid any foreign key constraint issues, regardless of the order in
-which the fixtures are loaded. 
+which the fixtures are loaded.
 
 ## Inheriting Data
 
