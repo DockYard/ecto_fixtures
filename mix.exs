@@ -15,7 +15,7 @@ defmodule EctoFixtures.Mixfile do
   #
   # Type `mix help compile.app` for more information
   def application do
-    [applications: [:logger, :uuid, :ecto]]
+    [applications: [:logger, :elixir_uuid, :ecto]]
   end
 
   def description do
@@ -44,7 +44,7 @@ defmodule EctoFixtures.Mixfile do
     [
       {:ecto, "> 0.0.0"},
       {:postgrex, "> 0.0.0", only: :test},
-      {:uuid, "~> 1.0"}
+      {:elixir_uuid, "~> 1.2"}
     ]
   end
 end
